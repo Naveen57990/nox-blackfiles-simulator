@@ -1,74 +1,142 @@
 import { state } from './core/state.js';
-import { CASE_DATA } from './core/case_data.js';
+import { CASES } from './core/case_data.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Bind notes area to state
   const notesArea = document.getElementById('notes-area');
-  notesArea.value = state.state.notes || '';
   notesArea.addEventListener('input', (e) => {
-    state.state.notes = e.target.value;
-    state.saveState();
+    state.updateNotes(e.target.value);
   });
 
-  renderAll();
+  renderLibrary();
+  
+  if (state.state.activeCaseId) {
+    document.getElementById('view-library').style.display = 'none';
+    document.getElementById('view-case').style.display = 'block';
+    renderCaseFile();
+    window.switchTab(state.state.activeView === 'library' ? 'brief' : state.state.activeView);
+  } else {
+    document.getElementById('view-library').style.display = 'block';
+    document.getElementById('view-case').style.display = 'none';
+  }
 });
 
 // --- NAVIGATION ---
 window.showLibrary = () => {
+  state.closeCase();
   document.getElementById('view-library').style.display = 'block';
   document.getElementById('view-case').style.display = 'none';
 };
 
 window.openCase = (id) => {
-  if(id === 'NOX-1145') {
-    document.getElementById('view-library').style.display = 'none';
-    document.getElementById('view-case').style.display = 'block';
-    window.switchTab('brief');
-    renderAll();
-  }
+  state.openCase(id);
+  document.getElementById('view-library').style.display = 'none';
+  document.getElementById('view-case').style.display = 'block';
+  
+  renderCaseFile();
+  window.switchTab('brief');
 };
 
 window.switchTab = (tabId) => {
+  if(tabId === 'library') return;
+  state.setView(tabId);
+  
   document.querySelectorAll('.tab-btn').forEach(b => {
     b.classList.remove('active');
     if(b.getAttribute('onclick').includes(tabId)) b.classList.add('active');
   });
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(`tab-${tabId}`).classList.add('active');
+  
+  const targetTab = document.getElementById(`tab-${tabId}`);
+  if(targetTab) targetTab.classList.add('active');
 };
 
-// --- RENDERING ---
-function renderAll() {
-  renderScene();
-  renderEvidence();
-  renderPeople();
-  renderTimeline();
+// --- RENDERING LIBRARY ---
+function renderLibrary() {
+  const c = document.querySelector('.case-list');
+  c.innerHTML = '';
+  
+  Object.values(CASES).forEach(caseData => {
+    const meta = caseData.meta;
+    const isLocked = meta.status !== 'Available';
+    
+    c.innerHTML += `
+      <div class="case-card" ${isLocked ? 'style="opacity:0.5; cursor:default;"' : `onclick="window.openCase('${meta.id}')"`}>
+        <div class="case-meta">
+          <span>${meta.id}</span> 
+          <span>${meta.type}</span> 
+          <span>${meta.location}</span> 
+          <span>Difficulty: ${meta.difficulty}</span>
+        </div>
+        <h2>${meta.title}</h2>
+        <p>${caseData.brief.what}</p>
+        ${!isLocked ? `<button class="btn-open">OPEN CASE FILE</button>` : `<p style="font-family:var(--font-mono); font-size:11px;">FILE LOCKED</p>`}
+      </div>
+    `;
+  });
 }
 
-function renderScene() {
-  const c = document.getElementById('scene-container');
-  c.innerHTML = `
-    <p>Location: Server Room B</p>
-    <p>Victim is found lying on the floor. Rigor mortis is absent. There are severe burn marks on his hands.</p>
-    <div style="border:1px solid var(--border); padding: 15px; margin: 20px 0;">
-      <h4 style="font-family:var(--font-sans); margin:0 0 10px 0;">Discovered Items</h4>
-      <ul style="margin:0; padding-left: 20px; font-size: 14px;">
-        <li><a href="#" style="color:var(--accent);" onclick="window.openItem('ev_wristband')">Anti-static wristband</a></li>
-        <li><a href="#" style="color:var(--accent);" onclick="window.openItem('ev_power_logs')">Rack 4 Power Logs</a></li>
-        <li><a href="#" style="color:var(--accent);" onclick="window.openItem('ev_drive')">Encrypted USB Drive</a></li>
-      </ul>
+// --- RENDERING CASE FILE ---
+function renderCaseFile() {
+  const caseId = state.state.activeCaseId;
+  if (!caseId || !CASES[caseId]) return;
+  
+  const data = CASES[caseId];
+  
+  // Header
+  document.querySelector('.dossier-id').innerText = data.meta.id;
+  document.querySelector('.dossier-title').innerText = data.meta.title;
+  document.querySelector('.dossier-details').innerHTML = `
+    <div><span>LOCATION</span> ${data.meta.location}</div>
+    <div><span>DATE</span> ${data.meta.date}</div>
+    <div><span>TYPE</span> ${data.meta.type}</div>
+    <div><span>DIFFICULTY</span> ${data.meta.difficulty}</div>
+  `;
+  
+  // Notes
+  const cs = state.getCaseState();
+  document.getElementById('notes-area').value = cs ? cs.notes : '';
+
+  renderBrief(data);
+  renderScene(data);
+  renderEvidence(data, cs);
+  renderPeople(data, cs);
+  renderTimeline(data);
+}
+
+function renderBrief(data) {
+  document.getElementById('tab-brief').innerHTML = `
+    <h3>Case Brief</h3>
+    <div class="brief-text">
+      <p><strong>What happened?</strong><br>${data.brief.what}</p>
+      <p><strong>Initial Assessment:</strong><br>${data.brief.assessment}</p>
+      <p><strong>The Objective:</strong><br>${data.brief.objective}</p>
     </div>
-    <p>The main power breaker for Rack 4 is locked out manually. The facility manager confirms this is standard procedure before touching the rack hardware.</p>
   `;
 }
 
-function renderEvidence() {
+function renderScene(data) {
+  const c = document.getElementById('scene-container');
+  let obsHtml = data.scene.observations.map(o => `<li>${o}</li>`).join('');
+  
+  c.innerHTML = `
+    <p><strong>Location:</strong> ${data.scene.location}</p>
+    <div style="border:1px solid var(--border); padding: 15px; margin: 20px 0;">
+      <h4 style="font-family:var(--font-sans); margin:0 0 10px 0;">Investigator Observations</h4>
+      <ul style="margin:0; padding-left: 20px; font-size: 14px;">
+        ${obsHtml}
+      </ul>
+    </div>
+  `;
+}
+
+function renderEvidence(data, cs) {
   const c = document.getElementById('evidence-container');
   c.innerHTML = '';
-  
-  Object.values(CASE_DATA.evidence).forEach(ev => {
+  Object.values(data.evidence).forEach(ev => {
+    const isRead = cs && cs.inspected.includes(ev.id);
     c.innerHTML += `
-      <div class="item-row" onclick="window.openItem('${ev.id}')">
+      <div class="item-row" onclick="window.openItem('${ev.id}')" style="${isRead ? 'opacity:0.7;' : ''}">
         <div class="item-info">
           <h4>${ev.title}</h4>
           <span class="meta">${ev.type} | SOURCE: ${ev.source}</span>
@@ -79,12 +147,13 @@ function renderEvidence() {
   });
 }
 
-function renderPeople() {
+function renderPeople(data, cs) {
   const c = document.getElementById('people-container');
   c.innerHTML = '';
-  Object.values(CASE_DATA.characters).forEach(char => {
+  Object.values(data.people).forEach(char => {
+    const isRead = cs && cs.inspected.includes(char.id);
     c.innerHTML += `
-      <div class="item-row" onclick="window.openItem('${char.id}')">
+      <div class="item-row" onclick="window.openItem('${char.id}')" style="${isRead ? 'opacity:0.7;' : ''}">
         <div class="item-info">
           <h4>${char.name}</h4>
           <span class="meta">${char.role}</span>
@@ -95,18 +164,9 @@ function renderPeople() {
   });
 }
 
-function renderTimeline() {
+function renderTimeline(data) {
   const c = document.getElementById('timeline-container');
-  const events = [
-    { time: '18:30', desc: 'Neha Sharma remains late in the building after most staff leave.' },
-    { time: '22:15', desc: 'Ajay Desai accesses the billing API repository.' },
-    { time: '23:05', desc: 'Ajay enters Server Room B.' },
-    { time: '23:08', desc: 'Manual breaker for Rack 4 is locked out by Ajay.' },
-    { time: '23:14', desc: 'Emergency Bypass Relay triggered remotely from 10.0.4.55.' },
-    { time: '01:15', desc: 'Victim discovered by night security.' }
-  ];
-  
-  c.innerHTML = events.map(ev => `
+  c.innerHTML = data.timeline.map(ev => `
     <div class="timeline-event">
       <div class="timeline-time">${ev.time}</div>
       <div class="timeline-desc">${ev.desc}</div>
@@ -116,10 +176,14 @@ function renderTimeline() {
 
 // --- MODAL VIEWER ---
 window.openItem = (id) => {
+  const caseId = state.state.activeCaseId;
+  const data = CASES[caseId];
   const c = document.getElementById('modal-content-area');
   
+  state.inspectItem(id);
+  
   if (id.startsWith('ev_')) {
-    const ev = CASE_DATA.evidence[id];
+    const ev = data.evidence[id];
     c.innerHTML = `
       <span class="viewer-meta">EVIDENCE RECORD: ${ev.id}</span>
       <h2 class="viewer-title">${ev.title}</h2>
@@ -134,21 +198,22 @@ window.openItem = (id) => {
       </div>
     `;
   } else if (id.startsWith('char_')) {
-    const char = CASE_DATA.characters[id];
+    const char = data.people[id];
     c.innerHTML = `
       <span class="viewer-meta">PERSON OF INTEREST: ${char.id}</span>
       <h2 class="viewer-title">${char.name}</h2>
       <div class="viewer-body">
         <div class="key-value"><span class="key">ROLE</span><span class="val">${char.role}</span></div>
         <p style="margin-top:30px;"><strong>STATEMENT</strong></p>
-        <p style="font-style:italic; padding-left:15px; border-left:2px solid var(--border-light);">"${char.dialogue_tree.intro.text}"</p>
+        <p style="font-style:italic; padding-left:15px; border-left:2px solid var(--border-light);">"${char.statement}"</p>
         <p style="margin-top:20px;"><strong>INVESTIGATOR NOTES</strong></p>
-        <p>She has authorization for the VPN bypass. Needs to be cross-referenced with the network logs.</p>
+        <p>${char.notes}</p>
       </div>
     `;
   }
   
   document.getElementById('item-modal').classList.add('active');
+  renderCaseFile(); // re-render to fade out read items
 };
 
 window.closeModal = () => {
@@ -158,21 +223,30 @@ window.closeModal = () => {
 window.submitConclusion = () => {
   const who = document.getElementById('conc-who').value.toLowerCase();
   const res = document.getElementById('conclusion-feedback');
+  const caseId = state.state.activeCaseId;
+  const truth = CASES[caseId].truth;
+  
   res.style.display = 'block';
   
-  if (who.includes('neha')) {
+  // Very basic validation based on the hidden truth 'who' field
+  // In a full game, we would do deeper NLP or specific dropdowns.
+  const culpritStr = truth.who.toLowerCase();
+  
+  if (culpritStr.includes(who) && who.length > 3) {
     res.innerHTML = `
       <div style="padding: 20px; border: 1px solid #10b981; background: rgba(16,185,129,0.1);">
         <h4 style="color:#10b981; margin:0 0 10px 0; font-family:var(--font-serif); font-size:24px;">CASE RESOLVED</h4>
-        <p><strong>ESTABLISHED:</strong> Neha Sharma orchestrated the sabotage to cover up financial embezzlement.</p>
-        <p><strong>SUPPORTED:</strong> The physical tampering of the wristband combined with the remote VPN access logs form an airtight timeline.</p>
+        <p><strong>ESTABLISHED:</strong> ${truth.who} is responsible.</p>
+        <p><strong>METHOD:</strong> ${truth.how}</p>
+        <p><strong>MOTIVE:</strong> ${truth.why}</p>
+        <p style="margin-top:15px; font-size:12px; color:var(--muted);">Red Herrings Cleared: ${truth.red_herrings.join(' | ')}</p>
       </div>
     `;
   } else {
     res.innerHTML = `
       <div style="padding: 20px; border: 1px solid #ef4444; background: rgba(239,68,68,0.1);">
         <h4 style="color:#ef4444; margin:0 0 10px 0; font-family:var(--font-serif); font-size:24px;">UNRESOLVED</h4>
-        <p>The conclusion does not align with the established evidence. Re-examine the VPN logs and the wristband modifications.</p>
+        <p>Your conclusion does not align with the established evidence. Re-examine the timeline and contradictions.</p>
       </div>
     `;
   }
