@@ -3,67 +3,99 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NOX Blackfiles // Workstation</title>
+<title>NOX Blackfiles // Intelligence Workstation</title>
 <link rel="stylesheet" href="css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script type="module" src="js/main.js" defer></script>
 </head>
 <body>
 
-<div class="shell">
-  <!-- Investigation Workstation Panel -->
-  <aside class="workstation-panel">
-    <div class="case-id-header">
-      <h1>NOX-1145</h1>
-      <div class="status">Active Investigation</div>
+<div class="workstation">
+  <!-- Top Command Bar -->
+  <header class="command-bar">
+    <div class="case-meta">
+      <span class="case-id">NOX-1145</span>
+      <span style="color:var(--status-active)">● ACTIVE INVESTIGATION</span>
+      <span style="color:var(--muted)">// THE SERVER ROOM SABOTAGE</span>
     </div>
-    
-    <nav class="nav-menu">
-      <button class="nav-item active" data-view-target="scene">Scene Report</button>
-      <button class="nav-item" data-view-target="evidence">Evidence Vault</button>
-      <button class="nav-item" data-view-target="board">Deduction Board</button>
-      <button class="nav-item" data-view-target="interrogation">Interrogation</button>
+    <div class="metrics">
+      <span>EVIDENCE <span class="metric-val" id="metric-ev">0/8</span></span>
+      <span>LEADS <span class="metric-val" id="metric-ld">0/3</span></span>
+      <button class="export-btn" onclick="window.print()">EXPORT DOSSIER</button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="workspace">
+    <!-- Side Navigation -->
+    <nav class="system-nav">
+      <div class="nav-group">
+        <div class="nav-group-title">Analysis</div>
+        <button class="nav-btn active" data-view-target="scene">Scene Report</button>
+        <button class="nav-btn" data-view-target="evidence">Evidence Vault</button>
+        <button class="nav-btn" data-view-target="leads">Active Leads</button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Synthesis</div>
+        <button class="nav-btn" data-view-target="board">Investigation Board</button>
+        <button class="nav-btn" data-view-target="hypotheses">Hypotheses</button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Operations</div>
+        <button class="nav-btn" data-view-target="interrogation">Interrogation</button>
+      </div>
     </nav>
-    
-    <div style="padding: 20px; border-top: 1px solid var(--border);">
-      <div id="status-progress" style="font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-bottom: 10px;">0 / 5 Evidence Found</div>
-      <button id="btn-reset" style="background:transparent; border:none; color:var(--muted); font-size:10px; cursor:pointer; text-decoration:underline;">[Wipe Local State]</button>
+
+    <!-- Canvas Area -->
+    <div class="canvas">
+      
+      <!-- View: Scene -->
+      <section id="view-scene" class="view-layer active">
+        <div id="scene-content"></div>
+      </section>
+
+      <!-- View: Evidence -->
+      <section id="view-evidence" class="view-layer">
+        <h2 class="doc-title">Evidence Vault</h2>
+        <div class="doc-meta">Items pending review and deep forensic analysis.</div>
+        <div class="evidence-toolbar">
+          <input type="text" class="search-input" placeholder="Search ID, tag, or description..." id="ev-search">
+        </div>
+        <div id="evidence-grid" class="evidence-grid"></div>
+      </section>
+
+      <!-- View: Leads (New) -->
+      <section id="view-leads" class="view-layer">
+        <h2 class="doc-title">Active Leads</h2>
+        <div class="doc-meta">Emerging vectors requiring investigation.</div>
+        <div id="leads-container"></div>
+      </section>
+
+      <!-- View: Hypotheses (New) -->
+      <section id="view-hypotheses" class="view-layer">
+        <h2 class="doc-title">Hypothesis Engine</h2>
+        <div class="doc-meta">Formulate and test theories against collected evidence.</div>
+        <div id="hypotheses-container"></div>
+      </section>
+
+      <!-- View: Board -->
+      <section id="view-board" class="view-layer" style="padding:0; overflow:hidden;">
+        <div id="board-viewport">
+          <div id="board-canvas-layer">
+            <svg id="board-lines" style="position:absolute; width:100%; height:100%; pointer-events:none;"></svg>
+            <div id="board-nodes-layer"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Interrogation -->
+      <section id="view-interrogation" class="view-layer">
+        <h2 class="doc-title">Interrogation Suite</h2>
+        <div class="doc-meta">Current Subject: Neha Sharma (VP Engineering)</div>
+        <div id="interrogation-content" class="interrogation-stage"></div>
+      </section>
+
     </div>
-  </aside>
-
-  <!-- Interactive Case Canvas -->
-  <main class="workspace-canvas">
-    
-    <!-- View: Scene Report -->
-    <section id="view-scene" class="view-pane">
-      <div id="scene-content"></div>
-    </section>
-
-    <!-- View: Evidence -->
-    <section id="view-evidence" class="view-pane" style="display:none;">
-      <div style="margin-bottom: 40px;">
-        <h2 style="font-family: var(--font-display); font-size: 32px; margin: 0 0 5px 0;">Evidence Vault</h2>
-        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 12px;">Deep inspection required for deduction extraction.</p>
-      </div>
-      <div id="evidence-grid"></div>
-    </section>
-
-    <!-- View: Board -->
-    <section id="view-board" class="view-pane" style="display:none; padding: 0;">
-      <div style="position: absolute; top: 40px; left: 40px; z-index: 10;">
-        <h2 style="font-family: var(--font-display); font-size: 32px; margin: 0 0 5px 0;">Deduction Board</h2>
-        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 12px; background: rgba(0,0,0,0.5); padding: 5px;">Link nodes to formulate hypotheses.</p>
-      </div>
-      <div id="board-canvas">
-        <svg id="board-lines"></svg>
-      </div>
-    </section>
-
-    <!-- View: Interrogation -->
-    <section id="view-interrogation" class="view-pane" style="display:none;">
-      <div id="interrogation-content"></div>
-    </section>
-
   </main>
 </div>
 

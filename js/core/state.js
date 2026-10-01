@@ -2,7 +2,7 @@ import { CASE_DATA } from './case_data.js';
 
 class StateManager {
   constructor() {
-    this.storageKey = 'nox_state_v2';
+    this.storageKey = 'nox_v1_state';
     this.listeners = [];
     this.state = this.loadState() || this.getInitialState();
   }
@@ -10,15 +10,17 @@ class StateManager {
   getInitialState() {
     return {
       activeView: 'scene',
-      inventory: [],
-      inspected: [],
+      inventory: [], // IDs of collected evidence
+      inspected: [], // IDs of deeply inspected evidence
+      activeLeads: [],
       resolvedLeads: [],
-      unlockedLeads: ['lead_01', 'lead_02'],
-      boardNodes: [],
-      boardConnections: [],
-      hypotheses: [],
-      characterStates: {
-        'char_neha': { emotion: 'CALM', node: 'intro', memory: [] }
+      hypotheses: [
+        { id: 'hyp_1', text: 'Accidental Electrocution', support: [], contradict: [] }
+      ],
+      boardNodes: [], // {id, type, x, y}
+      boardConnections: [], // "id1::id2"
+      characters: {
+        'char_neha': { node: 'intro', emotion: 'CALM', memory: [] }
       }
     };
   }
@@ -50,7 +52,7 @@ class StateManager {
     this.listeners.forEach(cb => cb(this.state));
   }
 
-  // Actions
+  // --- Actions ---
   setView(view) {
     this.state.activeView = view;
     this.saveState();
@@ -59,6 +61,14 @@ class StateManager {
   collectEvidence(id) {
     if (!this.state.inventory.includes(id)) {
       this.state.inventory.push(id);
+      
+      // Auto-add to board
+      this.state.boardNodes.push({
+        id, type: 'evidence', 
+        x: window.innerWidth / 2 + (Math.random()*100-50), 
+        y: window.innerHeight / 2 + (Math.random()*100-50)
+      });
+      
       this.saveState();
       return true;
     }
@@ -68,19 +78,26 @@ class StateManager {
   inspectEvidence(id) {
     if (!this.state.inspected.includes(id)) {
       this.state.inspected.push(id);
-      // Unlock new evidence or leads based on inspection
+      
       const ev = CASE_DATA.evidence[id];
-      if (ev && ev.unlocks) {
-        ev.unlocks.forEach(unlockId => {
-          if (unlockId.startsWith('lead_') && !this.state.unlockedLeads.includes(unlockId)) {
-            this.state.unlockedLeads.push(unlockId);
-          } else if (unlockId.startsWith('ev_') && !this.state.inventory.includes(unlockId)) {
-            this.state.inventory.push(unlockId);
+      if (ev) {
+        if (ev.unlocks_ev) ev.unlocks_ev.forEach(u => this.collectEvidence(u));
+        if (ev.unlocks_lead) ev.unlocks_lead.forEach(u => {
+          if (!this.state.activeLeads.includes(u) && !this.state.resolvedLeads.includes(u)) {
+            this.state.activeLeads.push(u);
           }
         });
       }
       this.saveState();
     }
+  }
+
+  addHypothesis(text) {
+    this.state.hypotheses.push({
+      id: 'hyp_' + Date.now(),
+      text, support: [], contradict: []
+    });
+    this.saveState();
   }
 }
 
