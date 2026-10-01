@@ -1,0 +1,416 @@
+const fs = require('fs');
+
+const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NOX-1146 DOSSIER</title>
+<style>
+  body {
+    background-color: #525659; /* PDF viewer background */
+    margin: 0;
+    padding: 40px 0;
+    font-family: "Times New Roman", Times, serif;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    margin: 0 auto 20px auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    padding: 25.4mm; /* 1 inch margins */
+    box-sizing: border-box;
+    color: black;
+    position: relative;
+    page-break-after: always;
+  }
+  h1, h2, h3, h4 { font-family: "Arial", sans-serif; text-transform: uppercase; }
+  .header { text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 30px; }
+  .header h1 { margin: 0; font-size: 24px; }
+  .header p { margin: 5px 0 0 0; font-family: "Arial", sans-serif; font-size: 12px; }
+  .confidential { color: #d32f2f; font-weight: bold; font-family: Arial, sans-serif; border: 2px solid #d32f2f; display: inline-block; padding: 5px 10px; transform: rotate(-5deg); position: absolute; top: 30px; right: 30px; }
+  
+  .content { font-size: 11pt; line-height: 1.5; text-align: justify; }
+  .table { width: 100%; border-collapse: collapse; margin: 20px 0; font-family: Arial, sans-serif; font-size: 10pt; }
+  .table th, .table td { border: 1px solid black; padding: 8px; text-align: left; }
+  .table th { background-color: #f0f0f0; }
+  
+  .transcript { margin-left: 20px; font-family: "Courier New", Courier, monospace; font-size: 10pt; }
+  .q { font-weight: bold; margin-top: 15px; }
+  .a { margin-bottom: 15px; }
+  
+  .signature-block { margin-top: 50px; display: flex; justify-content: space-between; }
+  .signature-line { border-top: 1px solid black; width: 200px; text-align: center; padding-top: 5px; font-family: Arial, sans-serif; font-size: 10pt; }
+  
+  .footer { position: absolute; bottom: 20mm; left: 25.4mm; right: 25.4mm; font-family: Arial, sans-serif; font-size: 9pt; border-top: 1px solid #ccc; padding-top: 5px; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1: TITLE PAGE -->
+<div class="page">
+  <div class="confidential">CONFIDENTIAL<br>EYES ONLY</div>
+  <div style="text-align: center; margin-top: 100px;">
+    <h1 style="font-size: 36px; margin-top: 40px;">INVESTIGATION DOSSIER</h1>
+    <h2 style="font-size: 24px; color: #444;">CASE FILE: NOX-1146</h2>
+    <div style="margin-top: 80px; font-size: 14pt; line-height: 2;">
+      <strong>SUBJECT:</strong> THE SILENT APARTMENT<br>
+      <strong>JURISDICTION:</strong> BANDRA WEST DIVISION, MUMBAI<br>
+      <strong>DATE OF REGISTRATION:</strong> 12 NOVEMBER 2026<br>
+      <strong>CLASSIFICATION:</strong> SUSPICIOUS DEATH / BURGLARY<br>
+      <strong>INVESTIGATING OFFICER:</strong> SENIOR INSP. R. DESHMUKH<br>
+    </div>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 1</span>
+  </div>
+</div>
+
+<!-- PAGE 2: INDEX -->
+<div class="page">
+  <div class="header">
+    <h1>INDEX OF MATERIALS</h1>
+    <p>CASE REF: NOX-1146 / BANDRA WEST</p>
+  </div>
+  <div class="content">
+    <table class="table">
+      <tr><th>SECTION</th><th>DESCRIPTION</th></tr>
+      <tr><td>01</td><td>FIRST INFORMATION REPORT (FIR)</td></tr>
+      <tr><td>02</td><td>INITIAL CRIME SCENE REPORT</td></tr>
+      <tr><td>03</td><td>SCENE REGISTER & SEIZURE MEMO (PANCHNAMA)</td></tr>
+      <tr><td>04</td><td>FORENSIC & POST-MORTEM FINDINGS</td></tr>
+      <tr><td>05</td><td>TOXICOLOGY REPORT</td></tr>
+      <tr><td>06</td><td>PHARMACY & MEDICAL RECORDS</td></tr>
+      <tr><td>07</td><td>WITNESS STATEMENT: ANANYA RAO (DAUGHTER)</td></tr>
+      <tr><td>08</td><td>WITNESS STATEMENT: DR. ARIS VARGHESE</td></tr>
+      <tr><td>09</td><td>INTERROGATION TRANSCRIPT: KIRAN PATIL (SUSPECT)</td></tr>
+      <tr><td>10</td><td>CCTV & TELECOM ANALYSIS</td></tr>
+    </table>
+    <p><em>Note: This dossier contains unredacted material. Unauthorized distribution is prohibited under the Official Secrets Act.</em></p>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 2</span>
+  </div>
+</div>
+
+<!-- PAGE 3: FIR -->
+<div class="page">
+  <div class="header">
+    <h1>SECTION 01: FIRST INFORMATION REPORT</h1>
+    <p>FORM 1 (Section 154 Cr.P.C.)</p>
+  </div>
+  <div class="content">
+    <p><strong>1. District:</strong> Mumbai Suburban &nbsp;&nbsp;&nbsp; <strong>P.S.:</strong> Bandra West &nbsp;&nbsp;&nbsp; <strong>Year:</strong> 2026 &nbsp;&nbsp;&nbsp; <strong>FIR No:</strong> 0842/2026</p>
+    <p><strong>2. Date & Time of Occurrence:</strong> Discovered on 12 Nov 2026 at 07:30 HRS.</p>
+    <p><strong>3. Type of Information:</strong> Written/Oral (Telephonic emergency line 100)</p>
+    <p><strong>4. Place of Occurrence:</strong> Flat 804, Sea View Towers, Carter Road, Bandra West, Mumbai.</p>
+    <p><strong>5. Complainant / Informant:</strong><br>Name: Mrs. Lakshmi Kamble (Housekeeper)<br>Age: 45<br>Occupation: Domestic Worker</p>
+    <p><strong>6. Details of known/suspected/unknown accused:</strong> Unknown.</p>
+    <p><strong>7. Particulars of properties stolen / involved:</strong> Assorted gold jewelry (approx value ₹4,50,000), cash from dresser.</p>
+    
+    <h3>BRIEF FACTS OF THE CASE:</h3>
+    <p>On 12-11-2026 at approximately 07:35 HRS, the control room received a call from Mrs. Lakshmi Kamble stating that her employer, Mrs. Priya Rao (Age 62), was lying unresponsive in her bed at Flat 804, Sea View Towers. The complainant noted that the sliding glass door to the sea-facing balcony was shattered and the master bedroom had been completely ransacked, with clothes and jewelry boxes thrown onto the floor.</p>
+    <p>Patrol Unit Charlie-4 was dispatched and arrived at 07:42 HRS. They secured the premises and confirmed the victim was deceased. No pulse was found. The body was cold to the touch. Rigor mortis was present. No visible blood or signs of a physical struggle were present on the victim, which appeared inconsistent with a violent home invasion. The Crime Branch was subsequently notified.</p>
+    
+    <div class="signature-block">
+      <div class="signature-line">Signature of Complainant</div>
+      <div class="signature-line">Signature of Officer in Charge</div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 3</span>
+  </div>
+</div>
+
+<!-- PAGE 4: SCENE REPORT -->
+<div class="page">
+  <div class="header">
+    <h1>SECTION 02: INITIAL CRIME SCENE REPORT</h1>
+    <p>CRIME SCENE INVESTIGATION UNIT</p>
+  </div>
+  <div class="content">
+    <h3>2.1 PHYSICAL LAYOUT</h3>
+    <p>Flat 804 is a 3-BHK sea-facing apartment. The main entrance door was locked from the inside (deadbolt engaged) when the housekeeper arrived. She used her spare key to enter. The living room, kitchen, and guest bedrooms were undisturbed.</p>
+    <p>The master bedroom, located at the rear of the apartment facing the ocean, was the locus of the incident. A large sliding glass door connects this room to a balcony.</p>
+    
+    <h3>2.2 POINT OF ENTRY</h3>
+    <p>The balcony sliding glass door was shattered near the locking mechanism. The glass shards fell entirely INSIDE the bedroom, confirming the force originated from the exterior (balcony). A 4-foot crowbar or similar prying tool mark was found on the aluminum frame.</p>
+    
+    <h3>2.3 BEDROOM CONDITIONS</h3>
+    <p>The wooden dresser opposite the bed was ransacked. Three drawers were pulled out completely and dumped onto the carpet. A velvet jewelry box was found empty.</p>
+    <p>Distinct muddy footprints (pattern matching a generic sports sneaker, approx size 9) were identified. The tracks lead directly from the shattered balcony door to the dresser, pivot sharply, and lead back out to the balcony. <strong>Crucially, no footprints approach the bed.</strong></p>
+    
+    <h3>2.4 VICTIM OBSERVATIONS</h3>
+    <p>The victim, Priya Rao, was found in the center of a king-sized bed. She was lying on her back, covered to the chest by a duvet. Her eyes were closed. Her facial expression was relaxed. There were no defensive wounds on her hands or arms. No petechial hemorrhaging in the eyes. Lividity (pooling of blood) was fixed on her posterior, indicating her body had not been moved since death.</p>
+    <p>On the bedside nightstand, investigators found a glass of water (half empty), reading glasses, and two empty 10-tablet blister packs of Zolpidem (a prescription sedative).</p>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 4</span>
+  </div>
+</div>
+
+<!-- PAGE 5: SCENE REGISTER -->
+<div class="page">
+  <div class="header">
+    <h1>SECTION 03: SCENE REGISTER & SEIZURE</h1>
+    <p>PANCHNAMA DOCUMENTATION</p>
+  </div>
+  <div class="content">
+    <table class="table">
+      <tr>
+        <th width="15%">EXHIBIT ID</th>
+        <th width="35%">DESCRIPTION</th>
+        <th width="25%">LOCATION FOUND</th>
+        <th width="25%">NOTES / STATUS</th>
+      </tr>
+      <tr>
+        <td>EX-01</td>
+        <td>Glass fragments (Tempered)</td>
+        <td>Bedroom floor, interior</td>
+        <td>Sent for tool-mark analysis.</td>
+      </tr>
+      <tr>
+        <td>EX-02</td>
+        <td>Muddy footprint lifts (x4)</td>
+        <td>Carpet between balcony and dresser</td>
+        <td>Size 9, distinct chevron tread.</td>
+      </tr>
+      <tr>
+        <td>EX-03</td>
+        <td>Empty blister pack A (Zolpidem)</td>
+        <td>Nightstand, right side of bed</td>
+        <td>Printed text: 10mg. Expiry: 2028.</td>
+      </tr>
+      <tr>
+        <td>EX-04</td>
+        <td>Empty blister pack B (Zolpidem)</td>
+        <td>Nightstand, right side of bed</td>
+        <td>Printed text: 10mg. Expiry: 2028.</td>
+      </tr>
+      <tr>
+        <td>EX-05</td>
+        <td>Gold Chain (Broken clasp)</td>
+        <td>Exterior balcony floor</td>
+        <td>Dropped by perpetrator during escape.</td>
+      </tr>
+      <tr>
+        <td>EX-06</td>
+        <td>Medical File / Prescriptions</td>
+        <td>Living room desk</td>
+        <td>Contains records from Dr. Aris Varghese.</td>
+      </tr>
+    </table>
+    
+    <h3>3.1 MISSING ITEMS (AS REPORTED BY DAUGHTER)</h3>
+    <ul>
+      <li>One heavy gold Mangalsutra.</li>
+      <li>Four gold bangles (22k).</li>
+      <li>Approx ₹40,000 in emergency cash usually kept in the bottom drawer.</li>
+    </ul>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 5</span>
+  </div>
+</div>
+
+<!-- PAGE 6: POST-MORTEM -->
+<div class="page">
+  <div class="header">
+    <h1>SECTION 04: POST-MORTEM FINDINGS</h1>
+    <p>DEPARTMENT OF FORENSIC MEDICINE</p>
+  </div>
+  <div class="content">
+    <p><strong>Autopsy No:</strong> PM-2026/11-402<br>
+    <strong>Name of Deceased:</strong> Priya Rao<br>
+    <strong>Age/Sex:</strong> 62/F<br>
+    <strong>Date of Autopsy:</strong> 13 Nov 2026</p>
+    
+    <h3>4.1 EXTERNAL EXAMINATION</h3>
+    <p>The body is that of a normally nourished female. Rigor mortis is fully developed and passing off in the upper extremities. Post-mortem lividity is present over the back and is fixed. No external injuries, abrasions, contusions, or lacerations are present anywhere on the body.</p>
+    
+    <h3>4.2 INTERNAL EXAMINATION</h3>
+    <p><strong>Cranial Cavity:</strong> Brain is edematous. No intracranial hemorrhage.<br>
+    <strong>Thoracic Cavity:</strong> Lungs are heavy, congested, and highly edematous, exuding frothy fluid on section. Heart is unremarkable for age.<br>
+    <strong>Abdominal Cavity:</strong> Stomach contains approx 100ml of clear fluid with dissolved particulate matter. Liver and kidneys are congested.</p>
+    
+    <h3>4.3 ESTIMATED TIME OF DEATH</h3>
+    <p>Based on the state of rigor mortis, fixed lividity, and gastric emptying, the estimated time of death is firmly placed between <strong>23:00 HRS and 00:00 HRS on 11 November 2026</strong>.</p>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 6</span>
+  </div>
+</div>
+
+<!-- PAGE 7: TOXICOLOGY -->
+<div class="page">
+  <div class="header">
+    <h1>SECTION 05: TOXICOLOGY REPORT</h1>
+    <p>FORENSIC SCIENCE LABORATORY (FSL)</p>
+  </div>
+  <div class="content">
+    <p><strong>FSL Ref:</strong> TOX-26-9931</p>
+    
+    <h3>5.1 ANALYTICAL FINDINGS</h3>
+    <table class="table">
+      <tr><th>SUBSTANCE</th><th>SPECIMEN</th><th>CONCENTRATION</th><th>REFERENCE RANGE (THERAPEUTIC)</th></tr>
+      <tr><td>Zolpidem</td><td>Blood</td><td><strong>210 ng/mL</strong></td><td>20 - 50 ng/mL</td></tr>
+      <tr><td>Ethanol</td><td>Blood</td><td>Negative</td><td>N/A</td></tr>
+    </table>
+    
+    <h3>5.2 INTERPRETATION</h3>
+    <p>The blood concentration of Zolpidem (210 ng/mL) is significantly above the therapeutic range and falls into the toxic/fatal range, particularly for an elderly patient. This concentration is consistent with the acute ingestion of at least 20mg to 30mg of Zolpidem within a short time frame.</p>
+    
+    <h3>5.3 CAUSE OF DEATH</h3>
+    <p><strong>Death is due to respiratory depression secondary to acute Zolpidem toxicity.</strong></p>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 7</span>
+  </div>
+</div>
+
+<!-- PAGE 8: PHARMACY RECORDS -->
+<div class="page">
+  <div class="header">
+    <h1>SECTION 06: MEDICAL & PHARMACY RECORDS</h1>
+    <p>INVESTIGATIVE SUBPOENA RETURNS</p>
+  </div>
+  <div class="content">
+    <h3>6.1 APOLLO PHARMACY DISPENSING RECORD</h3>
+    <p>Subpoena of records from the local pharmacy located 500m from the victim's residence.</p>
+    <table class="table">
+      <tr>
+        <th>DATE</th>
+        <th>PRESCRIBER</th>
+        <th>MEDICATION</th>
+        <th>QUANTITY / INSTRUCTIONS</th>
+      </tr>
+      <tr>
+        <td>08 Nov 2026</td>
+        <td>Dr. Aris Varghese</td>
+        <td>Zolpidem Tartrate <strong>10mg</strong></td>
+        <td>30 Tablets. "Take 1/2 or 1 tablet at bedtime."</td>
+      </tr>
+      <tr>
+        <td>05 Oct 2026</td>
+        <td>Dr. Aris Varghese</td>
+        <td>Zolpidem Tartrate 5mg</td>
+        <td>30 Tablets. "Take 1 tablet at bedtime."</td>
+      </tr>
+    </table>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 8</span>
+  </div>
+</div>
+
+<!-- PAGE 9: DAUGHTER STATEMENT -->
+<div class="page">
+  <div class="header">
+    <h1>SECTION 07: WITNESS STATEMENT</h1>
+    <p>ANANYA RAO (DAUGHTER OF DECEASED)</p>
+  </div>
+  <div class="content">
+    <div class="transcript">
+      <div class="q">Q: When was the last time you spoke to your mother?</div>
+      <div class="a">A: I called her last night at exactly 8:00 PM. We spoke for about 15 minutes. She always went to sleep early.</div>
+      
+      <div class="q">Q: Did you notice anything unusual during the call?</div>
+      <div class="a">A: She sounded a little confused. She kept asking me what day it was, and her speech was a bit slow. She was diagnosed with early-stage dementia six months ago. Her memory was getting worse.</div>
+      
+      <div class="q">Q: Was she taking any medication?</div>
+      <div class="a">A: Yes, for her blood pressure, and also sleeping pills. Zolpidem. I specifically told her doctor, Dr. Aris, to be very careful with her dosages because she forgets if she's taken them and takes them again. I asked him to keep her on the absolute lowest dose, 5mg. </div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 9</span>
+  </div>
+</div>
+
+<!-- PAGE 10: DOCTOR STATEMENT -->
+<div class="page">
+  <div class="header">
+    <h1>SECTION 08: WITNESS STATEMENT</h1>
+    <p>DR. ARIS VARGHESE (PHYSICIAN)</p>
+  </div>
+  <div class="content">
+    <div class="transcript">
+      <div class="q">Q: Doctor, we are reviewing her medications. Can you confirm what you prescribed her for insomnia?</div>
+      <div class="a">A: Yes, of course. She complained of severe insomnia. Given her age and cognitive decline, I kept her on a very strict, low dose of Zolpidem. Standard 5mg tablets. I have my notes right here. I strictly warned her daughter to monitor the dosage.</div>
+      
+      <div class="q">Q: Did you recently alter that prescription?</div>
+      <div class="a">A: No, absolutely not. I would never prescribe a higher dose to a patient with her profile. It would be negligent. She was on 5mg. If she took too much, that is unfortunately out of my hands.</div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 10</span>
+  </div>
+</div>
+
+<!-- PAGE 11: SUSPECT INTERROGATION -->
+<div class="page">
+  <div class="header">
+    <h1>SECTION 09: INTERROGATION TRANSCRIPT</h1>
+    <p>SUSPECT: KIRAN "SPIDER" PATIL</p>
+  </div>
+  <div class="content">
+    <div class="transcript">
+      <div class="q">Q: You were caught with Priya Rao's jewelry. We know you broke into Flat 804. We have your footprints. You are facing a murder charge.</div>
+      <div class="a">A: Look! I'll admit the theft. I'm a cat burglar. That's what I do. But I didn't kill anyone! I swear to God!</div>
+      
+      <div class="q">Q: Then explain what happened.</div>
+      <div class="a">A: It was late. Really late. Past 2:30 in the morning. I scaled the drain pipe. I picked the 8th floor because it was dark. I popped the glass door with my pry bar and stepped inside.</div>
+      
+      <div class="q">Q: And then you attacked the old woman in the bed.</div>
+      <div class="a">A: No! I didn't even go near the bed! I went straight for the wooden dresser. I pulled the drawers out, grabbed the jewelry boxes, and stuffed the gold in my pockets.</div>
+      
+      <div class="q">Q: And she just slept through you smashing glass and throwing drawers?</div>
+      <div class="a">A: That's what I thought at first! I was freezing, waiting for her to wake up and scream. But she didn't move. She didn't even breathe. I looked over at the bed. The street light was shining on her face. She was completely pale. Sir, she was already dead. She was dead before I even got there!</div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 11</span>
+  </div>
+</div>
+
+<!-- PAGE 12: CCTV ANALYSIS -->
+<div class="page">
+  <div class="header">
+    <h1>SECTION 10: CCTV & TELECOM ANALYSIS</h1>
+    <p>DIGITAL FORENSICS WING</p>
+  </div>
+  <div class="content">
+    <h3>10.1 STREET CCTV (CAMERA 04)</h3>
+    <p>Camera 04 covers the alleyway running parallel to the Sea View Towers balcony stack. Footage was reviewed from 20:00 to 06:00.</p>
+    <ul>
+      <li><strong>02:15:40 HRS:</strong> A male subject enters the alley and approaches the cast-iron drain pipe.</li>
+      <li><strong>02:40:00 HRS:</strong> Estimated time the subject reaches the 8th floor balcony (Flat 804) and breaks the glass (consistent with the timeline of forced entry).</li>
+      <li><strong>02:45:12 HRS:</strong> Subject is seen rapidly sliding down the pipe in obvious distress. He slips near the 2nd floor, falls to the ground, and immediately sprints out of camera view.</li>
+    </ul>
+    
+    <div style="text-align: center; margin-top: 150px; font-weight: bold; border: 2px solid black; padding: 20px; display: inline-block;">
+      END OF DOSSIER MATERIAL
+    </div>
+  </div>
+  <div class="footer">
+    <span>MAHARASHTRA POLICE CID</span>
+    <span>PAGE 12</span>
+  </div>
+</div>
+
+</body>
+</html>
+`;
+
+fs.writeFileSync('cases/NOX-1146_dossier.html', html);
+console.log('Dossier generated.');

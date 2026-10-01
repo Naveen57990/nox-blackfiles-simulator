@@ -51,6 +51,14 @@ window.switchTab = (tabId) => {
   if(targetTab) targetTab.classList.add('active');
 };
 
+window.openDossier = (caseId) => {
+  if (caseId === 'NOX-1146') {
+    window.open('cases/NOX-1146_dossier.html', '_blank');
+  } else {
+    alert("Dossier document for this case is currently being digitized. Please check back later.");
+  }
+};
+
 // --- RENDERING LIBRARY ---
 function renderLibrary() {
   const c = document.querySelector('.case-list');
@@ -107,11 +115,19 @@ function renderCaseFile() {
 function renderBrief(data) {
   const formatText = (text) => text ? text.replace(/\n/g, '<br>') : '';
   document.getElementById('tab-brief').innerHTML = `
-    <h3>Case Brief</h3>
+    <h3>Case Overview</h3>
     <div class="brief-text">
-      <p><strong>What happened?</strong><br>${formatText(data.brief.what)}</p>
-      <p><strong>Initial Assessment:</strong><br>${formatText(data.brief.assessment)}</p>
-      <p><strong>The Objective:</strong><br>${formatText(data.brief.objective)}</p>
+      <p style="font-size:18px; margin-bottom: 20px;">The core investigation material for this case is contained within a secure digital dossier.</p>
+      
+      <div style="font-family:var(--font-mono); font-size:12px; color:var(--muted); margin-bottom: 30px;">
+        <div>DOCUMENT REF: DOSSIER-${data.meta.id}</div>
+        <div>PAGES: 12</div>
+        <div>ATTACHMENTS: Included in document</div>
+      </div>
+      
+      <p><strong>Initial Summary:</strong><br>${formatText(data.brief.what)}</p>
+      
+      <button class="btn-open" onclick="window.openDossier('${data.meta.id}')" style="background:var(--fg); color:var(--bg); padding: 15px 30px; font-size: 16px; margin-top: 40px; font-weight: bold; border: none; letter-spacing: 2px;">OPEN FULL CASE DOSSIER</button>
     </div>
   `;
 }
