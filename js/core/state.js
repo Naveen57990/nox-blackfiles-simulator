@@ -2,7 +2,7 @@ import { CASE_DATA } from './case_data.js';
 
 class StateManager {
   constructor() {
-    this.storageKey = 'nox_v1_state';
+    this.storageKey = 'nox_v3_state';
     this.listeners = [];
     this.state = this.loadState() || this.getInitialState();
   }
@@ -28,7 +28,11 @@ class StateManager {
   loadState() {
     try {
       const data = localStorage.getItem(this.storageKey);
-      return data ? JSON.parse(data) : null;
+      if (data) {
+        const parsed = JSON.parse(data);
+        return { ...this.getInitialState(), ...parsed };
+      }
+      return null;
     } catch (e) {
       return null;
     }

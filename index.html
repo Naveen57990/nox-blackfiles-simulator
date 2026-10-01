@@ -3,104 +3,130 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NOX Blackfiles // Intelligence Workstation</title>
+<title>NOX Blackfiles</title>
 <link rel="stylesheet" href="css/main.css">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <script type="module" src="js/main.js" defer></script>
 </head>
 <body>
 
-<div class="workstation">
-  <!-- Top Command Bar -->
-  <header class="command-bar">
-    <div class="case-meta">
-      <span class="case-id">NOX-1145</span>
-      <span style="color:var(--status-active)">● ACTIVE INVESTIGATION</span>
-      <span style="color:var(--muted)">// THE SERVER ROOM SABOTAGE</span>
-    </div>
-    <div class="metrics">
-      <span>EVIDENCE <span class="metric-val" id="metric-ev">0/8</span></span>
-      <span>LEADS <span class="metric-val" id="metric-ld">0/3</span></span>
-      <button class="export-btn" onclick="window.print()">EXPORT DOSSIER</button>
-    </div>
+<div class="container">
+  
+  <header>
+    <div class="brand" onclick="window.showLibrary()">NOX Blackfiles</div>
+    <div style="font-family: var(--font-mono); font-size: 10px; color: var(--muted);">INTERNAL SYSTEM</div>
   </header>
 
-  <!-- Main Workspace -->
-  <main class="workspace">
-    <!-- Side Navigation -->
-    <nav class="system-nav">
-      <div class="nav-group">
-        <div class="nav-group-title">Analysis</div>
-        <button class="nav-btn active" data-view-target="scene">Scene Report</button>
-        <button class="nav-btn" data-view-target="evidence">Evidence Vault</button>
-        <button class="nav-btn" data-view-target="leads">Active Leads</button>
-      </div>
-      <div class="nav-group">
-        <div class="nav-group-title">Synthesis</div>
-        <button class="nav-btn" data-view-target="board">Investigation Board</button>
-        <button class="nav-btn" data-view-target="hypotheses">Hypotheses</button>
-      </div>
-      <div class="nav-group">
-        <div class="nav-group-title">Operations</div>
-        <button class="nav-btn" data-view-target="interrogation">Interrogation</button>
-      </div>
+  <!-- VIEW: CASE LIBRARY -->
+  <main id="view-library" style="display: block;">
+    <h1 style="font-size: 32px; margin-bottom: 30px;">Case Archives</h1>
+    <div class="case-list">
       
-      <div style="margin-top:auto; padding:24px;">
-        <button id="btn-reset" style="background:transparent; border:none; color:var(--muted); font-size:10px; cursor:pointer; text-decoration:underline;">[WIPE CASE CACHE]</button>
+      <div class="case-card" onclick="window.openCase('NOX-1145')">
+        <div class="case-meta"><span>NOX-1145</span> <span>Cybercrime / Sabotage</span> <span>Hyderabad</span> <span>Difficulty: 7/10</span></div>
+        <h2>The Server Room Sabotage</h2>
+        <p>A DevOps lead is found electrocuted in a secure server room. Initial assessment points to an industrial accident, but critical anomalies remain unresolved.</p>
+        <button class="btn-open">OPEN CASE FILE</button>
       </div>
-    </nav>
 
-    <!-- Canvas Area -->
-    <div class="canvas">
-      
-      <!-- View: Scene -->
-      <section id="view-scene" class="view-layer active">
-        <div id="scene-content"></div>
-      </section>
-
-      <!-- View: Evidence -->
-      <section id="view-evidence" class="view-layer">
-        <h2 class="doc-title">Evidence Vault</h2>
-        <div class="doc-meta">Items pending review and deep forensic analysis.</div>
-        <div class="evidence-toolbar">
-          <input type="text" class="search-input" placeholder="Search ID, tag, or description..." id="ev-search">
-        </div>
-        <div id="evidence-grid" class="evidence-grid"></div>
-      </section>
-
-      <!-- View: Leads (New) -->
-      <section id="view-leads" class="view-layer">
-        <h2 class="doc-title">Active Leads</h2>
-        <div class="doc-meta">Emerging vectors requiring investigation.</div>
-        <div id="leads-container"></div>
-      </section>
-
-      <!-- View: Hypotheses (New) -->
-      <section id="view-hypotheses" class="view-layer">
-        <h2 class="doc-title">Hypothesis Engine</h2>
-        <div class="doc-meta">Formulate and test theories against collected evidence.</div>
-        <div id="hypotheses-container"></div>
-      </section>
-
-      <!-- View: Board -->
-      <section id="view-board" class="view-layer" style="padding:0; overflow:hidden;">
-        <div id="board-viewport">
-          <div id="board-canvas-layer">
-            <svg id="board-lines" style="position:absolute; width:100%; height:100%; pointer-events:none;"></svg>
-            <div id="board-nodes-layer"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- View: Interrogation -->
-      <section id="view-interrogation" class="view-layer">
-        <h2 class="doc-title">Interrogation Suite</h2>
-        <div class="doc-meta">Current Subject: Neha Sharma (VP Engineering)</div>
-        <div id="interrogation-content" class="interrogation-stage"></div>
-      </section>
+      <div class="case-card" style="opacity: 0.5; cursor: default;">
+        <div class="case-meta"><span>NOX-1146</span> <span>Suspicious Death</span> <span>Mumbai</span> <span>Difficulty: 8/10</span></div>
+        <h2>The Silent Apartment</h2>
+        <p>File locked pending authorization.</p>
+      </div>
 
     </div>
   </main>
+
+  <!-- VIEW: CASE DOSSIER -->
+  <main id="view-case" style="display: none;">
+    <div class="dossier-header">
+      <span class="dossier-id">NOX-1145</span>
+      <h1 class="dossier-title">The Server Room Sabotage</h1>
+      <div class="dossier-details">
+        <div><span>LOCATION</span> Hyderabad</div>
+        <div><span>DATE</span> 04 October 2026</div>
+        <div><span>TYPE</span> Cybercrime / Sabotage</div>
+        <div><span>DIFFICULTY</span> 7/10</div>
+      </div>
+    </div>
+
+    <nav class="dossier-nav">
+      <button class="tab-btn active" onclick="window.switchTab('brief')">Case Brief</button>
+      <button class="tab-btn" onclick="window.switchTab('scene')">Scene</button>
+      <button class="tab-btn" onclick="window.switchTab('evidence')">Evidence</button>
+      <button class="tab-btn" onclick="window.switchTab('people')">People</button>
+      <button class="tab-btn" onclick="window.switchTab('timeline')">Timeline</button>
+      <button class="tab-btn" onclick="window.switchTab('notes')">My Notes</button>
+      <button class="tab-btn" onclick="window.switchTab('conclusion')">Conclusion</button>
+    </nav>
+
+    <div id="tab-brief" class="section active">
+      <h3>Case Brief</h3>
+      <div class="brief-text">
+        <p><strong>What happened?</strong><br>Ajay Desai, a 34-year-old DevOps Lead, was found dead in Server Room B at approximately 01:15 AM. The cause of death is severe electrocution.</p>
+        <p><strong>Initial Assessment:</strong><br>Facility management has provisionally ruled it an accident. Desai was performing routine late-night maintenance on Rack 4. He was wearing an anti-static (ESD) wristband.</p>
+        <p><strong>The Objective:</strong><br>Review the scene, examine the technical and forensic evidence, and determine if this was a genuine industrial accident or premeditated sabotage.</p>
+      </div>
+    </div>
+
+    <div id="tab-scene" class="section">
+      <h3>Scene Observations</h3>
+      <div class="brief-text" id="scene-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <div id="tab-evidence" class="section">
+      <h3>Evidence Vault</h3>
+      <div class="item-list" id="evidence-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <div id="tab-people" class="section">
+      <h3>Persons of Interest</h3>
+      <div class="item-list" id="people-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <div id="tab-timeline" class="section">
+      <h3>Reconstructed Timeline</h3>
+      <div id="timeline-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <div id="tab-notes" class="section">
+      <h3>Investigator Notes</h3>
+      <p style="font-size: 13px;">Record your reasoning, contradictions, and deductions here. Autosaved.</p>
+      <textarea id="notes-area" placeholder="Type your notes here... e.g., 'The breaker was off, so how did the power surge occur?'"></textarea>
+    </div>
+
+    <div id="tab-conclusion" class="section">
+      <h3>Submit Conclusion</h3>
+      <div class="conclusion-form">
+        <label>Who is responsible?</label>
+        <textarea id="conc-who" placeholder="Identify the culprit..."></textarea>
+        <label>How was it done? (Method)</label>
+        <textarea id="conc-how" placeholder="Explain the mechanics of the sabotage..."></textarea>
+        <label>Why was it done? (Motive)</label>
+        <textarea id="conc-why" placeholder="Explain the underlying motive..."></textarea>
+        <button class="btn-open" onclick="window.submitConclusion()" style="background:var(--fg); color:var(--bg); padding: 12px 24px;">SUBMIT DOSSIER</button>
+      </div>
+      <div id="conclusion-feedback" style="margin-top: 30px; display: none;"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ITEM VIEWER MODAL -->
+<div class="modal-overlay" id="item-modal">
+  <div class="modal-content">
+    <button class="btn-close" onclick="window.closeModal()">×</button>
+    <div id="modal-content-area"></div>
+  </div>
 </div>
 
 </body>
