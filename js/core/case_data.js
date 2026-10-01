@@ -176,5 +176,45 @@ export const CASES = {
         insight: "11 Nov, 18:00 - SMS from Ex-Husband: 'You'll regret cutting me out of the will.'\n\nINVESTIGATOR NOTE: We checked the ex-husband's alibi. Flight manifests and immigration records prove he boarded Emirates Flight EK501 to Dubai at 17:30, using in-flight Wi-Fi to send the text. He is completely ruled out as a physical suspect."
       }
     }
+  },
+
+  "NOX-1147": {
+    meta: {
+      id: "NOX-1147",
+      title: "The Missing Ledger",
+      type: "Financial Fraud / Cybercrime",
+      location: "Bengaluru, Karnataka",
+      date: "28 August 2026",
+      difficulty: "7/10",
+      status: "Available"
+    },
+    truth: {
+      what: "Internal corporate sabotage staged to look like a Russian ransomware attack.",
+      who: "Vikram Singh (Chief Financial Officer)",
+      how: "Vikram Singh stole the IT Lead's (Tara Menon) credentials. He used them from his own office desktop (IP 192.168.1.15) to execute a wipe script on the Q3 ledger to destroy evidence of his embezzlement, and left a fake ransomware note.",
+      why: "To hide massive financial irregularities before the upcoming surprise audit.",
+      red_herrings: ["Actual Russian port scanning on the firewall.", "Tara Menon's credentials being used."],
+      unresolved: "Where the embezzled funds were actually routed.",
+      proven: "The internal IP address (192.168.1.15) maps to the CFO's personal desktop; linguistic analysis of the ransom note points to an Indian author ('revert back'); the firewall repelled the external Russian scan."
+    },
+    brief: {
+      what: "CASE BACKGROUND\n\nApex Logistics reported a massive ransomware attack on their offshore accounting servers. The entire Q3 ledger was wiped. The company claims a Russian syndicate known as 'DarkByte' breached their systems and destroyed the backups.",
+      assessment: "INITIAL REPORT\n\nThe breach occurred just 3 days before a scheduled surprise audit of the offshore accounts.",
+      objective: "Determine if this was an external breach or an internal cover-up."
+    },
+    scene: { location: "Apex Logistics HQ, Bengaluru", observations: [] },
+    timeline: [
+      { time: "27 Aug, 14:00", desc: "Firewall detects and blocks Russian IP scan." },
+      { time: "27 Aug, 23:45", desc: "Tara Menon's admin account logs in from internal IP 192.168.1.15." },
+      { time: "28 Aug, 00:15", desc: "Wipe script executed on Q3 ledger." }
+    ],
+    people: {
+      "char_vikram": { id: "char_vikram", name: "Vikram Singh", role: "Chief Financial Officer" },
+      "char_tara": { id: "char_tara", name: "Tara Menon", role: "IT Lead" }
+    },
+    evidence: {
+      "ev_logs": { id: "ev_logs" },
+      "ev_note": { id: "ev_note" }
+    }
   }
 };
