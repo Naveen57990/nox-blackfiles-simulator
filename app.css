@@ -1,0 +1,76 @@
+.evidence-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: var(--r);
+  margin-bottom: 12px;
+}
+.evidence-item h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: var(--accent);
+}
+.evidence-item p {
+  font-size: 13px;
+  color: var(--fg-dim);
+  margin: 0 0 12px 0;
+}
+.evidence-item .insight {
+  background: var(--bg-deep);
+  padding: 10px;
+  border-left: 3px solid var(--accent);
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--fg);
+}
+#evidence-container {
+  padding: 20px;
+}
+.board-container {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  background: radial-gradient(circle, var(--surface) 0%, var(--bg-deep) 100%);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.board-node {
+  position: absolute;
+  background: var(--surface-2);
+  border: 2px solid var(--border-2);
+  padding: 10px 15px;
+  border-radius: var(--r);
+  font-family: var(--font-display);
+  font-size: 13px;
+  cursor: grab;
+  user-select: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.board-node:active {
+  cursor: grabbing;
+}
+.board-node.type-suspect { border-color: #ff4b4b; }
+.board-node.type-method { border-color: #ffb84b; }
+.board-node.type-motive { border-color: #4b88ff; }
+
+#board-connections {
+  padding: 20px;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+#view-scene {
+  padding: 20px;
+  line-height: 1.6;
+  font-size: 15px;
+}
+#view-scene a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+#view-scene a:hover {
+  text-decoration: underline;
+}

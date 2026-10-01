@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Server Room Sabotage · NOX Blackfiles</title>
+<link rel="stylesheet" href="css/nox.css">
+<link rel="stylesheet" href="app.css">
+<script src="app.js" defer></script>
+<style>
+  body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); font-family: var(--font-base); }
+  .shell { display: flex; height: 100vh; overflow: hidden; }
+  .sidebar { width: 250px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+  .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
+  .sidebar-header h1 { font-size: 18px; margin: 0; font-family: var(--font-display); }
+  .sidebar-header .sub { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+  .nav { padding: 10px; display: flex; flex-direction: column; gap: 5px; }
+  .nav-btn { background: transparent; border: none; padding: 10px 15px; text-align: left; color: var(--fg-dim); font-size: 14px; cursor: pointer; border-radius: var(--r-sm); transition: background 0.1s; }
+  .nav-btn:hover { background: var(--surface-2); }
+  .nav-btn.active { background: var(--border); color: var(--fg); font-weight: 500; }
+  .content { flex: 1; overflow-y: auto; background: var(--bg); position: relative; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- Sidebar Navigation -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1>NOX-1145</h1>
+      <span class="sub">The Server Room Sabotage</span>
+    </div>
+    <div class="nav">
+      <button class="nav-btn active" data-view="scene" onclick="setView('scene')">Scene Report</button>
+      <button class="nav-btn" data-view="evidence" onclick="setView('evidence')">Evidence Inventory</button>
+      <button class="nav-btn" data-view="board" onclick="setView('board')">Deduction Board</button>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="content">
+    
+    <!-- View: Scene -->
+    <div id="view-scene" class="view" style="display:block;">
+      <!-- Populated by app.js -->
+    </div>
+
+    <!-- View: Evidence -->
+    <div id="view-evidence" class="view" style="display:none;">
+      <div style="padding: 20px 20px 0;">
+        <h2>Evidence Inventory</h2>
+        <p class="faint">Inspect items closely to extract actionable intelligence.</p>
+      </div>
+      <div id="evidence-container"></div>
+    </div>
+
+    <!-- View: Board -->
+    <div id="view-board" class="view" style="display:none;">
+      <div style="padding: 20px 20px 0;">
+        <h2>Deduction Board</h2>
+        <p class="faint">Drag and drop nodes onto each other to form connections. Connect the Method and Motive to the correct Suspect.</p>
+      </div>
+      <div id="deduction-board" class="board-container"></div>
+      <ul id="board-connections"></ul>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
