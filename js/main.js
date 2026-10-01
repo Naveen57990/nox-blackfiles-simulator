@@ -105,12 +105,13 @@ function renderCaseFile() {
 }
 
 function renderBrief(data) {
+  const formatText = (text) => text ? text.replace(/\n/g, '<br>') : '';
   document.getElementById('tab-brief').innerHTML = `
     <h3>Case Brief</h3>
     <div class="brief-text">
-      <p><strong>What happened?</strong><br>${data.brief.what}</p>
-      <p><strong>Initial Assessment:</strong><br>${data.brief.assessment}</p>
-      <p><strong>The Objective:</strong><br>${data.brief.objective}</p>
+      <p><strong>What happened?</strong><br>${formatText(data.brief.what)}</p>
+      <p><strong>Initial Assessment:</strong><br>${formatText(data.brief.assessment)}</p>
+      <p><strong>The Objective:</strong><br>${formatText(data.brief.objective)}</p>
     </div>
   `;
 }
@@ -182,6 +183,8 @@ window.openItem = (id) => {
   
   state.inspectItem(id);
   
+  const formatText = (text) => text ? text.replace(/\n/g, '<br>') : '';
+  
   if (id.startsWith('ev_')) {
     const ev = data.evidence[id];
     c.innerHTML = `
@@ -192,9 +195,9 @@ window.openItem = (id) => {
         <div class="key-value"><span class="key">SOURCE</span><span class="val">${ev.source}</span></div>
         <div class="key-value"><span class="key">RELIABILITY</span><span class="val">${ev.reliability}</span></div>
         <p style="margin-top:30px;"><strong>DESCRIPTION</strong></p>
-        <p>${ev.desc}</p>
+        <p>${formatText(ev.desc)}</p>
         <p style="margin-top:20px;"><strong>FORENSIC ANALYSIS / FULL TEXT</strong></p>
-        <p style="color:var(--accent);">${ev.insight}</p>
+        <p style="color:var(--accent);">${formatText(ev.insight)}</p>
       </div>
     `;
   } else if (id.startsWith('char_')) {
@@ -205,9 +208,9 @@ window.openItem = (id) => {
       <div class="viewer-body">
         <div class="key-value"><span class="key">ROLE</span><span class="val">${char.role}</span></div>
         <p style="margin-top:30px;"><strong>STATEMENT</strong></p>
-        <p style="font-style:italic; padding-left:15px; border-left:2px solid var(--border-light);">"${char.statement}"</p>
+        <p style="font-style:italic; padding-left:15px; border-left:2px solid var(--border-light);">${formatText(char.statement)}</p>
         <p style="margin-top:20px;"><strong>INVESTIGATOR NOTES</strong></p>
-        <p>${char.notes}</p>
+        <p>${formatText(char.notes)}</p>
       </div>
     `;
   }
