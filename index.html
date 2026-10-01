@@ -3,68 +3,68 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Server Room Sabotage · NOX Blackfiles</title>
-<link rel="stylesheet" href="css/nox.css">
-<link rel="stylesheet" href="app.css">
-<script src="app.js" defer></script>
-<style>
-  body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); font-family: var(--font-base); }
-  .shell { display: flex; height: 100vh; overflow: hidden; }
-  .sidebar { width: 250px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-  .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
-  .sidebar-header h1 { font-size: 18px; margin: 0; font-family: var(--font-display); }
-  .sidebar-header .sub { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
-  .nav { padding: 10px; display: flex; flex-direction: column; gap: 5px; }
-  .nav-btn { background: transparent; border: none; padding: 10px 15px; text-align: left; color: var(--fg-dim); font-size: 14px; cursor: pointer; border-radius: var(--r-sm); transition: background 0.1s; }
-  .nav-btn:hover { background: var(--surface-2); }
-  .nav-btn.active { background: var(--border); color: var(--fg); font-weight: 500; }
-  .content { flex: 1; overflow-y: auto; background: var(--bg); position: relative; }
-</style>
+<title>NOX Blackfiles // Workstation</title>
+<link rel="stylesheet" href="css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script type="module" src="js/main.js" defer></script>
 </head>
 <body>
 
 <div class="shell">
-  <!-- Sidebar Navigation -->
-  <div class="sidebar">
-    <div class="sidebar-header">
+  <!-- Investigation Workstation Panel -->
+  <aside class="workstation-panel">
+    <div class="case-id-header">
       <h1>NOX-1145</h1>
-      <span class="sub">The Server Room Sabotage</span>
+      <div class="status">Active Investigation</div>
     </div>
-    <div class="nav">
-      <button class="nav-btn active" data-view="scene" onclick="setView('scene')">Scene Report</button>
-      <button class="nav-btn" data-view="evidence" onclick="setView('evidence')">Evidence Inventory</button>
-      <button class="nav-btn" data-view="board" onclick="setView('board')">Deduction Board</button>
-    </div>
-  </div>
-
-  <!-- Main Content Area -->
-  <div class="content">
     
-    <!-- View: Scene -->
-    <div id="view-scene" class="view" style="display:block;">
-      <!-- Populated by app.js -->
+    <nav class="nav-menu">
+      <button class="nav-item active" data-view-target="scene">Scene Report</button>
+      <button class="nav-item" data-view-target="evidence">Evidence Vault</button>
+      <button class="nav-item" data-view-target="board">Deduction Board</button>
+      <button class="nav-item" data-view-target="interrogation">Interrogation</button>
+    </nav>
+    
+    <div style="padding: 20px; border-top: 1px solid var(--border);">
+      <div id="status-progress" style="font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-bottom: 10px;">0 / 5 Evidence Found</div>
+      <button id="btn-reset" style="background:transparent; border:none; color:var(--muted); font-size:10px; cursor:pointer; text-decoration:underline;">[Wipe Local State]</button>
     </div>
+  </aside>
+
+  <!-- Interactive Case Canvas -->
+  <main class="workspace-canvas">
+    
+    <!-- View: Scene Report -->
+    <section id="view-scene" class="view-pane">
+      <div id="scene-content"></div>
+    </section>
 
     <!-- View: Evidence -->
-    <div id="view-evidence" class="view" style="display:none;">
-      <div style="padding: 20px 20px 0;">
-        <h2>Evidence Inventory</h2>
-        <p class="faint">Inspect items closely to extract actionable intelligence.</p>
+    <section id="view-evidence" class="view-pane" style="display:none;">
+      <div style="margin-bottom: 40px;">
+        <h2 style="font-family: var(--font-display); font-size: 32px; margin: 0 0 5px 0;">Evidence Vault</h2>
+        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 12px;">Deep inspection required for deduction extraction.</p>
       </div>
-      <div id="evidence-container"></div>
-    </div>
+      <div id="evidence-grid"></div>
+    </section>
 
     <!-- View: Board -->
-    <div id="view-board" class="view" style="display:none;">
-      <div style="padding: 20px 20px 0;">
-        <h2>Deduction Board</h2>
-        <p class="faint">Drag and drop nodes onto each other to form connections. Connect the Method and Motive to the correct Suspect.</p>
+    <section id="view-board" class="view-pane" style="display:none; padding: 0;">
+      <div style="position: absolute; top: 40px; left: 40px; z-index: 10;">
+        <h2 style="font-family: var(--font-display); font-size: 32px; margin: 0 0 5px 0;">Deduction Board</h2>
+        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 12px; background: rgba(0,0,0,0.5); padding: 5px;">Link nodes to formulate hypotheses.</p>
       </div>
-      <div id="deduction-board" class="board-container"></div>
-      <ul id="board-connections"></ul>
-    </div>
+      <div id="board-canvas">
+        <svg id="board-lines"></svg>
+      </div>
+    </section>
 
-  </div>
+    <!-- View: Interrogation -->
+    <section id="view-interrogation" class="view-pane" style="display:none;">
+      <div id="interrogation-content"></div>
+    </section>
+
+  </main>
 </div>
 
 </body>
