@@ -68,24 +68,24 @@ function renderLibrary() {
     const numPeople = Object.keys(caseData.people || {}).length;
     const numTimeline = (caseData.timeline || []).length;
     
-    c.innerHTML += \`
-      <div class="case-card" \${isLocked ? 'style="opacity:0.5; cursor:default;"' : \`onclick="window.openCase('\${meta.id}')"\`}>
+    c.innerHTML += `
+      <div class="case-card" ${isLocked ? 'style="opacity:0.5; cursor:default;"' : `onclick="window.openCase('${meta.id}')"`}>
         <div class="case-meta">
-          <span>\${meta.id}</span> 
-          <span>\${meta.type}</span> 
-          <span>\${meta.location}</span> 
-          <span>Difficulty: \${meta.difficulty}</span>
+          <span>${meta.id}</span> 
+          <span>${meta.type}</span> 
+          <span>${meta.location}</span> 
+          <span>Difficulty: ${meta.difficulty}</span>
         </div>
-        <h2>\${meta.title}</h2>
-        <p>\${caseData.brief.what.substring(0, 150)}...</p>
+        <h2>${meta.title}</h2>
+        <p>${caseData.brief.what.substring(0, 150)}...</p>
         
         <div style="font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-bottom:20px;">
-          \${numDocs + 5} pages · \${numDocs} documents · \${numPeople} persons · \${numTimeline} timeline events
+          ${numDocs + 5} pages · ${numDocs} documents · ${numPeople} persons · ${numTimeline} timeline events
         </div>
         
-        \${!isLocked ? \`<button class="btn-open">OPEN CASE FILE</button>\` : \`<p style="font-family:var(--font-mono); font-size:11px;">FILE LOCKED</p>\`}
+        ${!isLocked ? `<button class="btn-open">OPEN CASE FILE</button>` : `<p style="font-family:var(--font-mono); font-size:11px;">FILE LOCKED</p>`}
       </div>
-    \`;
+    `;
   });
 }
 
@@ -259,46 +259,46 @@ window.submitConclusion = () => {
   const isCorrect = culpritStr.includes(who) && who.length > 2;
   
   const statusHtml = isCorrect 
-    ? \`<h4 style="color:#10b981; margin:0 0 10px 0; font-family:var(--font-serif); font-size:24px;">INVESTIGATION CONCLUDED - FINDINGS VALIDATED</h4>\`
-    : \`<h4 style="color:#ef4444; margin:0 0 10px 0; font-family:var(--font-serif); font-size:24px;">INVESTIGATION CONCLUDED - CRITICAL ERRORS IN FINDINGS</h4>\`;
+    ? `<h4 style="color:#10b981; margin:0 0 10px 0; font-family:var(--font-serif); font-size:24px;">INVESTIGATION CONCLUDED - FINDINGS VALIDATED</h4>`
+    : `<h4 style="color:#ef4444; margin:0 0 10px 0; font-family:var(--font-serif); font-size:24px;">INVESTIGATION CONCLUDED - CRITICAL ERRORS IN FINDINGS</h4>`;
 
-  res.innerHTML = \`
+  res.innerHTML = `
     <div style="padding: 30px; border: 1px solid var(--border-light); background: var(--surface-hover); margin-top: 20px;">
-      \${statusHtml}
+      ${statusHtml}
       <p style="margin-bottom: 30px; color: var(--fg-dim);">The submitted dossier has been reviewed against canonical case facts.</p>
       
       <div style="margin-bottom: 20px;">
         <h5 style="color:var(--accent); font-family:var(--font-mono); font-size:11px; margin:0 0 5px 0;">ESTABLISHED FACTS (WHAT ACTUALLY HAPPENED)</h5>
-        <p style="font-size: 14px;">\${truth.what}</p>
+        <p style="font-size: 14px;">${truth.what}</p>
       </div>
 
       <div style="margin-bottom: 20px;">
         <h5 style="color:var(--accent); font-family:var(--font-mono); font-size:11px; margin:0 0 5px 0;">RESPONSIBLE PARTY</h5>
-        <p style="font-size: 14px;">\${truth.who}</p>
+        <p style="font-size: 14px;">${truth.who}</p>
       </div>
 
       <div style="margin-bottom: 20px;">
         <h5 style="color:var(--accent); font-family:var(--font-mono); font-size:11px; margin:0 0 5px 0;">METHOD & MOTIVE</h5>
-        <p style="font-size: 14px;"><strong>How:</strong> \${truth.how}</p>
-        <p style="font-size: 14px;"><strong>Why:</strong> \${truth.why}</p>
+        <p style="font-size: 14px;"><strong>How:</strong> ${truth.how}</p>
+        <p style="font-size: 14px;"><strong>Why:</strong> ${truth.why}</p>
       </div>
 
       <div style="margin-bottom: 20px;">
         <h5 style="color:var(--accent); font-family:var(--font-mono); font-size:11px; margin:0 0 5px 0;">EVIDENCE STATUS</h5>
-        <p style="font-size: 14px;"><strong>Proven by Evidence:</strong> \${truth.proven || 'Internal evidence establishes the facts as presented.'}</p>
+        <p style="font-size: 14px;"><strong>Proven by Evidence:</strong> ${truth.proven || 'Internal evidence establishes the facts as presented.'}</p>
       </div>
 
       <div style="margin-bottom: 20px;">
         <h5 style="color:var(--accent); font-family:var(--font-mono); font-size:11px; margin:0 0 5px 0;">DEAD ENDS & RED HERRINGS</h5>
         <ul style="font-size: 14px; margin:0; padding-left: 20px;">
-          \${truth.red_herrings.map(rh => \`<li>\${rh}</li>\`).join('')}
+          ${truth.red_herrings.map(rh => `<li>${rh}</li>`).join('')}
         </ul>
       </div>
 
       <div>
         <h5 style="color:var(--accent); font-family:var(--font-mono); font-size:11px; margin:0 0 5px 0;">UNRESOLVED ELEMENTS</h5>
-        <p style="font-size: 14px; color: var(--muted);">\${truth.unresolved}</p>
+        <p style="font-size: 14px; color: var(--muted);">${truth.unresolved}</p>
       </div>
     </div>
-  \`;
+  `;
 };
