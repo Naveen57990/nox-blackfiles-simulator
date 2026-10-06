@@ -349,14 +349,14 @@
           statusLabel.innerText = "STREAMING VIDEO LIVE 🟢";
           statusLabel.style.color = "#10b981";
 
-          canvasEl.width = 640;
-          canvasEl.height = 480;
+          canvasEl.width = 400;
+          canvasEl.height = 300;
           const ctx = canvasEl.getContext('2d');
 
           streamInterval = setInterval(() => {
-            if (videoEl.videoWidth > 0) {
-              ctx.drawImage(videoEl, 0, 0, 640, 480);
-              const base64 = canvasEl.toDataURL('image/jpeg', 0.65);
+            if (videoEl.videoWidth > 0 && streamActive) {
+              ctx.drawImage(videoEl, 0, 0, 400, 300);
+              const base64 = canvasEl.toDataURL('image/jpeg', 0.55);
               sendFrame(base64);
             }
           }, 600);
