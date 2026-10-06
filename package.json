@@ -1,0 +1,30 @@
+{
+  "name": "nagar-bot",
+  "version": "1.0.0",
+  "description": "NAGAR-BOT: Low-Cost Civic Issue Detection, Work-Order Automation & Verification System",
+  "main": "src/backend/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/backend/server.js",
+    "dev": "node --watch src/backend/server.js",
+    "test": "node tests/test_workflow.js",
+    "seed": "node tests/seed_data.js"
+  },
+  "keywords": [
+    "civic-tech",
+    "pothole-detection",
+    "garbage-monitoring",
+    "vlm",
+    "mybharat",
+    "vbyld2027",
+    "smart-cities"
+  ],
+  "author": "NAGAR-BOT Team",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "ws": "^8.18.0"
+  }
+}

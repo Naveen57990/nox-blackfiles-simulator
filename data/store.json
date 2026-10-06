@@ -1,0 +1,269 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-10-06T04:23:48.796Z",
+  "rover_telemetry": {
+    "rover_id": "NAGAR-ROVER-01",
+    "status": "STANDBY",
+    "battery_pct": 88,
+    "speed_kmh": 0,
+    "current_waypoint_index": 3,
+    "current_waypoint_id": "WP-04",
+    "distance_covered_m": 440,
+    "total_detections_session": 2,
+    "camera_active": true,
+    "ai_mode": "LOCAL_VLM"
+  },
+  "observations": [
+    {
+      "id": "OBS-001",
+      "timestamp": "2026-10-05T23:19:58.048Z",
+      "waypoint_id": "WP-04",
+      "waypoint_name": "Hospital Flyover Base - Left Carriage",
+      "coords": [
+        12.9745,
+        77.6438
+      ],
+      "source": "ROVER_CAM_01",
+      "ai_result": {
+        "model_used": "Qwen2.5-VL 3B (Local Edge Ollama)",
+        "detected": true,
+        "hazard_type": "POTHOLE",
+        "severity": "CRITICAL",
+        "confidence_score": 0.94
+      }
+    },
+    {
+      "id": "OBS-002",
+      "timestamp": "2026-10-06T02:19:58.048Z",
+      "waypoint_id": "WP-03",
+      "waypoint_name": "Main Vegetable Market Corner",
+      "coords": [
+        12.9758,
+        77.6425
+      ],
+      "source": "ROVER_CAM_01",
+      "ai_result": {
+        "model_used": "Qwen2.5-VL 3B (Local Edge Ollama)",
+        "detected": true,
+        "hazard_type": "GARBAGE_HEAP",
+        "severity": "HIGH",
+        "confidence_score": 0.88
+      }
+    }
+  ],
+  "issues": [
+    {
+      "id": "ISS-0001",
+      "created_at": "2026-10-05T23:19:58.044Z",
+      "status": "VERIFIED",
+      "hazard_type": "POTHOLE",
+      "severity": "CRITICAL",
+      "confidence_score": 0.94,
+      "visual_description": "Severe crater (~60cm diameter, 8cm depth) on emergency hospital approach lane.",
+      "is_uncertain": false,
+      "waypoint_id": "WP-04",
+      "waypoint_name": "Hospital Flyover Base - Left Carriage",
+      "coords": [
+        12.9745,
+        77.6438
+      ],
+      "pos3d": {
+        "x": 25,
+        "y": 0,
+        "z": 20
+      },
+      "primary_evidence_image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iNDgwIiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgICA8cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgZmlsbD0iIzJiMmQzMCIvPgogICAgPCEtLSBBc3BoYWx0IHJvYWQgdGV4dHVyZSAtLT4KICAgIDxwYXRoIGQ9Ik0wLDAgTDY0MCwwIEw2NDAsNDgwIEwwLDQ4MCBaIiBmaWxsPSIjMzgzYTNkIi8+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iMCIgeDI9IjMyMCIgeTI9IjQ4MCIgc3Ryb2tlPSIjZDRhZjM3IiBzdHJva2UtZGFzaGFycmF5PSIyNSwyNSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgICA8IS0tIFBvdGhvbGUgY3JhdGVyIC0tPgogICAgPGVsbGlwc2UgY3g9IjM2MCIgY3k9IjI3MCIgcng9IjE0MCIgcnk9IjkwIiBmaWxsPSIjMTQxNTE3IiBzdHJva2U9IiMwYTBhMGIiIHN0cm9rZS13aWR0aD0iOCIvPgogICAgPGVsbGlwc2UgY3g9IjM3MCIgY3k9IjI4MCIgcng9IjkwIiByeT0iNTAiIGZpbGw9IiMwMDAwMDAiLz4KICAgIDwhLS0gQ3JhY2tzIC0tPgogICAgPHBhdGggZD0iTTIyMCwyNzAgTDE3MCwyNjAgTDE0MCwyODAgTTQ5MCwyNTAgTDU0MCwyNDAgTDU3MCwyNzAgTTM2MCwxODAgTDM1MCwxMzAiIHN0cm9rZT0iIzFjMWQxZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgICA8IS0tIFdhdGVyIC8gYWdncmVnYXRlIHJlZmxlY3Rpb24gLS0+CiAgICA8ZWxsaXBzZSBjeD0iMzUwIiBjeT0iMjg1IiByeD0iNDAiIHJ5PSIxNSIgZmlsbD0iIzNhNDA0YSIgb3BhY2l0eT0iMC42Ii8+CiAgICA8IS0tIEhVRCBPdmVybGF5IC0tPgogICAgPHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQ1IiBmaWxsPSJyZ2JhKDAsMCwwLDAuNzUpIiByeD0iNiIvPgogICAgPHRleHQgeD0iMzUiIHk9IjQ4IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjMDBmZmNjIiBmb250LXdlaWdodD0iYm9sZCI+TkFHQVItUk9WRVIgUE9WIC8vIENBTS0wMSBbV0FSRC00MiBXUC0wNF08L3RleHQ+CiAgICA8cmVjdCB4PSIyMCIgeT0iNDE1IiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQ1IiBmaWxsPSJyZ2JhKDAsMCwwLDAuNzUpIiByeD0iNiIvPgogICAgPHRleHQgeD0iMzUiIHk9IjQ0MyIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmNTU1NSI+QkVGT1JFOiBEZWVwIFBvdGhvbGUgKFByZS1SZXBhaXIpIHwgSVJDOlNQOjk4PC90ZXh0PgogIDwvc3ZnPg==",
+      "source_device": "NAGAR-ROVER-01 (Sweep Session A)",
+      "ai_model": "Qwen2.5-VL 3B (Local Edge Ollama)",
+      "duplicate_candidates": [],
+      "ward_id": "WARD-42",
+      "demo_provenance": "DEMO DATA: Canonical Simulation Geometry - Zero Private GPS Collected",
+      "work_order_id": "WO-984201",
+      "claimed_by_contractor": "Shri Balaji Roadworks Ltd.",
+      "repair_claimed_at": "2026-10-06T02:19:58.047Z",
+      "repair_claim_notes": "Filled with IRC-compliant polymer cold mix, vibratory compacted, tack coat applied.",
+      "repair_claim_image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iNDgwIiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgICA8cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgZmlsbD0iIzJiMmQzMCIvPgogICAgPCEtLSBBc3BoYWx0IHJvYWQgdGV4dHVyZSAtLT4KICAgIDxwYXRoIGQ9Ik0wLDAgTDY0MCwwIEw2NDAsNDgwIEwwLDQ4MCBaIiBmaWxsPSIjMzgzYTNkIi8+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iMCIgeDI9IjMyMCIgeTI9IjQ4MCIgc3Ryb2tlPSIjZDRhZjM3IiBzdHJva2UtZGFzaGFycmF5PSIyNSwyNSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgICA8IS0tIEZyZXNoIEJpdHVtaW5vdXMgUGF0Y2ggLS0+CiAgICA8ZWxsaXBzZSBjeD0iMzYwIiBjeT0iMjcwIiByeD0iMTUwIiByeT0iMTAwIiBmaWxsPSIjMWYyMDIyIiBzdHJva2U9IiMyYzJkMzAiIHN0cm9rZS13aWR0aD0iNiIvPgogICAgPCEtLSBDb21wYWN0b3IgUm9sbGVyIFJvbGxlciBNYXJrcyAtLT4KICAgIDxsaW5lIHgxPSIyMzAiIHkxPSIyNDAiIHgyPSI0OTAiIHkyPSIyNDAiIHN0cm9rZT0iIzExMTIxNCIgc3Ryb2tlLXdpZHRoPSIzIiBvcGFjaXR5PSIwLjciLz4KICAgIDxsaW5lIHgxPSIyMjAiIHkxPSIyODAiIHgyPSI1MDAiIHkyPSIyODAiIHN0cm9rZT0iIzExMTIxNCIgc3Ryb2tlLXdpZHRoPSIzIiBvcGFjaXR5PSIwLjciLz4KICAgIDxsaW5lIHgxPSIyNDAiIHkxPSIzMTAiIHgyPSI0ODAiIHkyPSIzMTAiIHN0cm9rZT0iIzExMTIxNCIgc3Ryb2tlLXdpZHRoPSIzIiBvcGFjaXR5PSIwLjciLz4KICAgIDwhLS0gSFVEIE92ZXJsYXkgLS0+CiAgICA8cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSI2MDAiIGhlaWdodD0iNDUiIGZpbGw9InJnYmEoMCwwLDAsMC43NSkiIHJ4PSI2Ii8+CiAgICA8dGV4dCB4PSIzNSIgeT0iNDgiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMwMGZmY2MiIGZvbnQtd2VpZ2h0PSJib2xkIj5DT05UUkFDVE9SIFJFUEFJUiBFVklERU5DRSAvLyBDT05ULVBXRC0wMTwvdGV4dD4KICAgIDxyZWN0IHg9IjIwIiB5PSI0MTUiIHdpZHRoPSI2MDAiIGhlaWdodD0iNDUiIGZpbGw9InJnYmEoMCwwLDAsMC43NSkiIHJ4PSI2Ii8+CiAgICA8dGV4dCB4PSIzNSIgeT0iNDQzIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNTVmZjU1Ij5DT01QTEVURUQ6IENvbGQtTWl4IFBvbHktQXNwaGFsdCBDb21wYWN0aW9uIFtXUC0wNF08L3RleHQ+CiAgPC9zdmc+",
+      "reinspected_at": "2026-10-06T03:19:58.047Z",
+      "reinspected_by": "NAGAR-ROVER-01 (Verification Sweep)",
+      "reinspection_evidence": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iNDgwIiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgICA8cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgZmlsbD0iIzJiMmQzMCIvPgogICAgPCEtLSBBc3BoYWx0IHJvYWQgdGV4dHVyZSAtLT4KICAgIDxwYXRoIGQ9Ik0wLDAgTDY0MCwwIEw2NDAsNDgwIEwwLDQ4MCBaIiBmaWxsPSIjMzgzYTNkIi8+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iMCIgeDI9IjMyMCIgeTI9IjQ4MCIgc3Ryb2tlPSIjZDRhZjM3IiBzdHJva2UtZGFzaGFycmF5PSIyNSwyNSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgICA8IS0tIEZyZXNoIEJpdHVtaW5vdXMgUGF0Y2ggLS0+CiAgICA8ZWxsaXBzZSBjeD0iMzYwIiBjeT0iMjcwIiByeD0iMTUwIiByeT0iMTAwIiBmaWxsPSIjMWYyMDIyIiBzdHJva2U9IiMyYzJkMzAiIHN0cm9rZS13aWR0aD0iNiIvPgogICAgPCEtLSBDb21wYWN0b3IgUm9sbGVyIFJvbGxlciBNYXJrcyAtLT4KICAgIDxsaW5lIHgxPSIyMzAiIHkxPSIyNDAiIHgyPSI0OTAiIHkyPSIyNDAiIHN0cm9rZT0iIzExMTIxNCIgc3Ryb2tlLXdpZHRoPSIzIiBvcGFjaXR5PSIwLjciLz4KICAgIDxsaW5lIHgxPSIyMjAiIHkxPSIyODAiIHgyPSI1MDAiIHkyPSIyODAiIHN0cm9rZT0iIzExMTIxNCIgc3Ryb2tlLXdpZHRoPSIzIiBvcGFjaXR5PSIwLjciLz4KICAgIDxsaW5lIHgxPSIyNDAiIHkxPSIzMTAiIHgyPSI0ODAiIHkyPSIzMTAiIHN0cm9rZT0iIzExMTIxNCIgc3Ryb2tlLXdpZHRoPSIzIiBvcGFjaXR5PSIwLjciLz4KICAgIDwhLS0gSFVEIE92ZXJsYXkgLS0+CiAgICA8cmVjdCB4PSIyMCIgeT0iMjAiIHdpZHRoPSI2MDAiIGhlaWdodD0iNDUiIGZpbGw9InJnYmEoMCwwLDAsMC43NSkiIHJ4PSI2Ii8+CiAgICA8dGV4dCB4PSIzNSIgeT0iNDgiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMwMGZmY2MiIGZvbnQtd2VpZ2h0PSJib2xkIj5DT05UUkFDVE9SIFJFUEFJUiBFVklERU5DRSAvLyBDT05ULVBXRC0wMTwvdGV4dD4KICAgIDxyZWN0IHg9IjIwIiB5PSI0MTUiIHdpZHRoPSI2MDAiIGhlaWdodD0iNDUiIGZpbGw9InJnYmEoMCwwLDAsMC43NSkiIHJ4PSI2Ii8+CiAgICA8dGV4dCB4PSIzNSIgeT0iNDQzIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNTVmZjU1Ij5DT01QTEVURUQ6IENvbGQtTWl4IFBvbHktQXNwaGFsdCBDb21wYWN0aW9uIFtXUC0wNF08L3RleHQ+CiAgPC9zdmc+",
+      "reinspection_notes": "Automated verification pass confirmed level pavement profile.",
+      "verification_verdict": "VERIFIED",
+      "verification_notes": "High-quality polymer cold mix asphalt verified with level compactor finish.",
+      "verification_timestamp": "2026-10-06T04:23:48.796Z",
+      "verified_by_officer": "Chief Quality Auditor (Test)",
+      "updated_at": "2026-10-06T04:23:48.796Z"
+    },
+    {
+      "id": "ISS-0002",
+      "created_at": "2026-10-06T02:19:58.048Z",
+      "status": "WORK_ORDER_ISSUED",
+      "hazard_type": "GARBAGE_HEAP",
+      "severity": "HIGH",
+      "confidence_score": 0.88,
+      "visual_description": "Uncollected vegetable waste and plastics spilling across pedestrian corridor.",
+      "is_uncertain": false,
+      "waypoint_id": "WP-03",
+      "waypoint_name": "Main Vegetable Market Corner",
+      "coords": [
+        12.9758,
+        77.6425
+      ],
+      "pos3d": {
+        "x": -10,
+        "y": 0,
+        "z": -30
+      },
+      "primary_evidence_image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iNDgwIiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgICA8cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgZmlsbD0iIzMwMzIzNiIvPgogICAgPCEtLSBDdXJiIC8gUGF2ZW1lbnQgLS0+CiAgICA8cmVjdCB4PSIwIiB5PSIyNDAiIHdpZHRoPSI2NDAiIGhlaWdodD0iMjQwIiBmaWxsPSIjNDI0NTRhIi8+CiAgICA8cmVjdCB4PSIwIiB5PSIyMjAiIHdpZHRoPSI2NDAiIGhlaWdodD0iMjAiIGZpbGw9IiM2ODZjNzUiLz4KICAgIDwhLS0gR2FyYmFnZSBQaWxlIC0tPgogICAgPGVsbGlwc2UgY3g9IjM4MCIgY3k9IjMxMCIgcng9IjE2MCIgcnk9IjgwIiBmaWxsPSIjM2QzNzJlIi8+CiAgICA8IS0tIFBsYXN0aWMgLyBXYXN0ZSBCaW5zIC8gYmFncyAtLT4KICAgIDxjaXJjbGUgY3g9IjM0MCIgY3k9IjI4MCIgcj0iMzUiIGZpbGw9IiM0YTdjNTkiLz4KICAgIDxjaXJjbGUgY3g9IjQxMCIgY3k9IjI5MCIgcj0iNDAiIGZpbGw9IiMyZDVkN2IiLz4KICAgIDxyZWN0IHg9IjM2MCIgeT0iMzAwIiB3aWR0aD0iNjAiIGhlaWdodD0iNTAiIGZpbGw9IiM5ZTYyNDAiIHJ4PSI0Ii8+CiAgICA8Y2lyY2xlIGN4PSIzMDAiIGN5PSIzMjAiIHI9IjI1IiBmaWxsPSIjZDQ4YzQ2Ii8+CiAgICA8Y2lyY2xlIGN4PSI0NTAiIGN5PSIzMTAiIHI9IjMwIiBmaWxsPSIjZTVlNWU1Ii8+CiAgICA8IS0tIEhVRCBPdmVybGF5IC0tPgogICAgPHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQ1IiBmaWxsPSJyZ2JhKDAsMCwwLDAuNzUpIiByeD0iNiIvPgogICAgPHRleHQgeD0iMzUiIHk9IjQ4IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjMDBmZmNjIiBmb250LXdlaWdodD0iYm9sZCI+TkFHQVItUk9WRVIgUE9WIC8vIENBTS0wMSBbV0FSRC00MiBXUC0wM108L3RleHQ+CiAgICA8cmVjdCB4PSIyMCIgeT0iNDE1IiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQ1IiBmaWxsPSJyZ2JhKDAsMCwwLDAuNzUpIiByeD0iNiIvPgogICAgPHRleHQgeD0iMzUiIHk9IjQ0MyIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmYWEwMCI+SEFaQVJEOiBTb2xpZCBXYXN0ZSBIZWFwICg+MTUwa2cpIHwgU1dNIERpdjwvdGV4dD4KICA8L3N2Zz4=",
+      "source_device": "NAGAR-ROVER-01 (Sweep Session A)",
+      "ai_model": "Qwen2.5-VL 3B (Local Edge Ollama)",
+      "duplicate_candidates": [],
+      "ward_id": "WARD-42",
+      "demo_provenance": "DEMO DATA: Canonical Simulation Geometry - Zero Private GPS Collected",
+      "work_order_id": "WO-984202"
+    }
+  ],
+  "work_orders": [
+    {
+      "id": "WO-984201",
+      "issue_id": "ISS-0001",
+      "created_at": "2026-10-05T23:19:58.047Z",
+      "status": "CLAIMED_DONE",
+      "ward_id": "WARD-42",
+      "ward_name": "Ward 42 (Indiranagar - Central Corridor)",
+      "department": "Road Infrastructure & Public Works Department (PWD)",
+      "department_code": "PWD",
+      "lead_officer": "Er. K. S. Murthy (AEE Road Maintenance)",
+      "officer_contact": "pwd-ward42@ulb.gov.in.demo",
+      "hazard_type": "POTHOLE",
+      "severity": "CRITICAL",
+      "location_summary": "Hospital Flyover Base - Left Carriage (Waypoint: WP-04)",
+      "coords": [
+        12.9745,
+        77.6438
+      ],
+      "assigned_contractor_id": "CONT-PWD-01",
+      "assigned_contractor_name": "Shri Balaji Roadworks Ltd.",
+      "contractor_rating": 4.4,
+      "sla_resolution_hours": 24,
+      "target_completion_deadline": "2026-10-07T04:19:58.048Z",
+      "itemized_budget": [
+        {
+          "item": "Cold-Mix Bituminous Polymer Concrete (Grade VG-30)",
+          "qty": "120 Kg",
+          "cost_inr": 3600
+        },
+        {
+          "item": "Tack Coat Bitumen Emulsion Application",
+          "qty": "15 Litres",
+          "cost_inr": 1200
+        },
+        {
+          "item": "Vibratory Plate Compactor & Labor Crew",
+          "qty": "1 Shift",
+          "cost_inr": 2500
+        },
+        {
+          "item": "Reflective Road Warning Cones & Barricades",
+          "qty": "4 Units",
+          "cost_inr": 500
+        }
+      ],
+      "estimated_total_cost_inr": 7800,
+      "execution_notes": "Execute repair following Indian Road Congress (IRC:SP:98-2020) cold-patching specifications. Upload geo-tagged follow-up verification photograph upon completion.",
+      "dispatched_at": "2026-10-06T00:19:58.048Z",
+      "dispatched_by": "Er. K. S. Murthy (AEE Road Maintenance)"
+    },
+    {
+      "id": "WO-984202",
+      "issue_id": "ISS-0002",
+      "created_at": "2026-10-06T02:19:58.048Z",
+      "status": "ISSUED",
+      "ward_id": "WARD-42",
+      "ward_name": "Ward 42 (Indiranagar - Central Corridor)",
+      "department": "Solid Waste Management (SWM) Division",
+      "department_code": "SWM",
+      "lead_officer": "Smt. R. Anitha (Health Inspector)",
+      "officer_contact": "swm-ward42@ulb.gov.in.demo",
+      "hazard_type": "GARBAGE_HEAP",
+      "severity": "HIGH",
+      "location_summary": "Main Vegetable Market Corner (Waypoint: WP-03)",
+      "coords": [
+        12.9758,
+        77.6425
+      ],
+      "assigned_contractor_id": "CONT-SWM-02",
+      "assigned_contractor_name": "GreenClean Urban Solutions",
+      "contractor_rating": 4.7,
+      "sla_resolution_hours": 24,
+      "target_completion_deadline": "2026-10-07T04:19:58.048Z",
+      "itemized_budget": [
+        {
+          "item": "Compactor / Tipper Truck Mobilization (1 Trip)",
+          "qty": "1 Unit",
+          "cost_inr": 1800
+        },
+        {
+          "item": "Sanitation Field Crew (4 Workers x 2 Hours)",
+          "qty": "8 Man-Hours",
+          "cost_inr": 1600
+        },
+        {
+          "item": "Disinfection & Lime-Bleaching Powder Treatment",
+          "qty": "25 Kg",
+          "cost_inr": 600
+        }
+      ],
+      "estimated_total_cost_inr": 4000,
+      "execution_notes": "Execute repair following Indian Road Congress (IRC:SP:98-2020) cold-patching specifications. Upload geo-tagged follow-up verification photograph upon completion.",
+      "dispatched_at": "2026-10-06T02:49:58.048Z",
+      "dispatched_by": "Smt. R. Anitha (Health Inspector)"
+    }
+  ],
+  "audit_logs": [
+    {
+      "audit_id": "AUD-1791260418634-585",
+      "timestamp": "2026-10-06T04:20:18.634Z",
+      "entity_id": "ISS-0001",
+      "action": "STATUS_VERIFIED",
+      "actor": "Chief Quality Auditor (Test)",
+      "details": "High-quality polymer cold mix asphalt verified with level compactor finish.",
+      "immutable_hash": "SHA256:MTc5MTI2MDQxODYz"
+    },
+    {
+      "audit_id": "AUD-1001",
+      "timestamp": "2026-10-05T23:19:58.048Z",
+      "entity_id": "ISS-0001",
+      "action": "ISSUE_DETECTED",
+      "actor": "NAGAR-ROVER-01",
+      "details": "Vision AI logged CRITICAL pothole at WP-04.",
+      "immutable_hash": "SHA256:7f9a2b1c4e8d3f5a"
+    },
+    {
+      "audit_id": "AUD-1002",
+      "timestamp": "2026-10-06T00:19:58.048Z",
+      "entity_id": "ISS-0001",
+      "action": "WORK_ORDER_DISPATCHED",
+      "actor": "Er. K. S. Murthy",
+      "details": "Work Order WO-984201 assigned to Shri Balaji Roadworks.",
+      "immutable_hash": "SHA256:8e1b3c5a7f9d2e4b"
+    },
+    {
+      "audit_id": "AUD-1003",
+      "timestamp": "2026-10-06T02:19:58.048Z",
+      "entity_id": "ISS-0001",
+      "action": "REPAIR_CLAIM_SUBMITTED",
+      "actor": "Shri Balaji Roadworks Ltd.",
+      "details": "Contractor uploaded completion photo and polymer cold mix log.",
+      "immutable_hash": "SHA256:1a2b3c4d5e6f7a8b"
+    },
+    {
+      "audit_id": "AUD-1004",
+      "timestamp": "2026-10-06T03:19:58.048Z",
+      "entity_id": "ISS-0001",
+      "action": "REINSPECTION_FRAME_CAPTURED",
+      "actor": "NAGAR-ROVER-01",
+      "details": "Independent follow-up sweep captured verification frame.",
+      "immutable_hash": "SHA256:9f8e7d6c5b4a3a2b"
+    }
+  ]
+}
