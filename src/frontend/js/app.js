@@ -149,8 +149,6 @@
               staticImg.src = msg.image_base64;
             }
           }
-        }
-
         // 2. Real-time AI detection result from phone stream
         else if (msg.type === "LIVE_AI_RESULT") {
           const ai = msg.ai_result;
@@ -166,6 +164,7 @@
               banner.className = 'hud-alert hud-alert-detected';
               banner.innerText = `🚨 LIVE: ${ai.hazard_type} DETECTED (${(ai.confidence_score * 100).toFixed(0)}%) -> TICKET CREATED`;
             }
+            renderBoundingBox(ai.bounding_box, ai.hazard_type, ai.confidence_score);
             playAlertBeep(true);
             showToast(`Live Detection: ${ai.hazard_type} at ${msg.waypoint ? msg.waypoint.id : 'Active Point'}`, 'alert');
           } else {
@@ -173,8 +172,108 @@
               banner.className = 'hud-alert';
               banner.innerText = '✅ LIVE: ROAD SURFACE NORMAL';
             }
+            clearBoundingBox();
           }
         }
+
+  // --- BOUNDING BOX RENDERER ---
+  function renderBoundingBox(bbox, hazardType, confidence) {
+    const canvas = document.getElementById('bbox-overlay-canvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const container = canvas.parentElement;
+    const w = container.clientWidth || 640;
+    const h = container.clientHeight || 480;
+
+    canvas.width = w;
+    canvas.height = h;
+    ctx.clearRect(0, 0, w, h);
+
+    if (!bbox || !Array.isArray(bbox) || bbox.length !== 4) return;
+
+    const [ymin, xmin, ymax, xmax] = bbox;
+    const top = (ymin / 1000) * h;
+    const left = (xmin / 1000) * w;
+    const boxW = Math.max(40, ((xmax - xmin) / 1000) * w);
+    const boxH = Math.max(30, ((ymax - ymin) / 1000) * h);
+
+    const isPothole = hazardType === 'POTHOLE';
+    const color = isPothole ? '#ef4444' : '#f59e0b';
+
+    // 1. Translucent fill
+    ctx.fillStyle = isPothole ? 'rgba(239, 68, 68, 0.18)' : 'rgba(245, 158, 11, 0.18)';
+    ctx.fillRect(left, top, boxW, boxH);
+
+    // 2. Dashed inner box
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 6]);
+    ctx.strokeRect(left, top, boxW, boxH);
+    ctx.setLineDash([]);
+
+    // 3. High-contrast solid cyber corner brackets
+    const cornerLen = Math.min(24, Math.min(boxW, boxH) * 0.35);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#ffffff';
+
+    // Top-Left
+    ctx.beginPath();
+    ctx.moveTo(left, top + cornerLen);
+    ctx.lineTo(left, top);
+    ctx.lineTo(left + cornerLen, top);
+    ctx.stroke();
+
+    // Top-Right
+    ctx.beginPath();
+    ctx.moveTo(left + boxW - cornerLen, top);
+    ctx.lineTo(left + boxW, top);
+    ctx.lineTo(left + boxW, top + cornerLen);
+    ctx.stroke();
+
+    // Bottom-Left
+    ctx.beginPath();
+    ctx.moveTo(left, top + boxH - cornerLen);
+    ctx.lineTo(left, top + boxH);
+    ctx.lineTo(left + cornerLen, top + boxH);
+    ctx.stroke();
+
+    // Bottom-Right
+    ctx.beginPath();
+    ctx.moveTo(left + boxW - cornerLen, top + boxH);
+    ctx.lineTo(left + boxW, top + boxH);
+    ctx.lineTo(left + boxW, top + boxH - cornerLen);
+    ctx.stroke();
+
+    // 4. Center Crosshairs Target
+    const cx = left + boxW / 2;
+    const cy = top + boxH / 2;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy); ctx.lineTo(cx + 10, cy);
+    ctx.moveTo(cx, cy - 10); ctx.lineTo(cx, cy + 10);
+    ctx.stroke();
+
+    // 5. Label Tag Badge
+    const labelText = `🚨 ${hazardType} [${(confidence * 100).toFixed(0)}% CONF]`;
+    ctx.font = 'bold 11px "JetBrains Mono", monospace';
+    const textWidth = ctx.measureText(labelText).width;
+
+    ctx.fillStyle = color;
+    ctx.fillRect(left, Math.max(0, top - 22), textWidth + 14, 22);
+
+    ctx.fillStyle = '#050505';
+    ctx.fillText(labelText, left + 7, Math.max(14, top - 6));
+  }
+
+  function clearBoundingBox() {
+    const canvas = document.getElementById('bbox-overlay-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
       } catch (err) {}
     };
 
@@ -719,6 +818,7 @@
           banner.className = 'hud-alert hud-alert-detected';
           banner.innerText = `🚨 ${res.ai_result.hazard_type} DETECTED (${(res.ai_result.confidence_score * 100).toFixed(0)}%) -> TICKET CREATED`;
         }
+        renderBoundingBox(res.ai_result.bounding_box, res.ai_result.hazard_type, res.ai_result.confidence_score);
         playAlertBeep(true);
         showToast(`Defect Logged: ${res.ai_result.hazard_type} at ${wpId}`, "alert");
       } else {
@@ -726,6 +826,7 @@
           banner.className = 'hud-alert';
           banner.innerText = '✅ ROAD SURFACE NORMAL (NO HAZARDS)';
         }
+        clearBoundingBox();
         showToast(`Normal Pavement Verified at ${wpId}`);
       }
 
