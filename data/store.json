@@ -1,19 +1,69 @@
 {
   "version": "1.0.0",
-  "last_updated": "2026-10-06T04:23:48.796Z",
+  "last_updated": "2026-10-06T05:15:47.753Z",
   "rover_telemetry": {
     "rover_id": "NAGAR-ROVER-01",
-    "status": "STANDBY",
-    "battery_pct": 88,
-    "speed_kmh": 0,
-    "current_waypoint_index": 3,
-    "current_waypoint_id": "WP-04",
-    "distance_covered_m": 440,
-    "total_detections_session": 2,
+    "status": "SWEEPING",
+    "battery_pct": 87,
+    "speed_kmh": 9.1,
+    "current_waypoint_index": 4,
+    "current_waypoint_id": "WP-05",
+    "distance_covered_m": 590,
+    "total_detections_session": 4,
     "camera_active": true,
     "ai_mode": "LOCAL_VLM"
   },
   "observations": [
+    {
+      "id": "OBS-1791263736231-427",
+      "timestamp": "2026-10-06T05:15:36.231Z",
+      "waypoint_id": "WP-04",
+      "waypoint_name": "Hospital Flyover Base - Left Carriage",
+      "coords": [
+        12.9745,
+        77.6438
+      ],
+      "source": "ROVER_CAM_01",
+      "ai_result": {
+        "success": true,
+        "model_used": "NAGAR-BOT Heuristic Vision Engine (Demo Fallback)",
+        "latency_ms": 120,
+        "inference_type": "HEURISTIC_RULE_FALLBACK",
+        "detected": true,
+        "hazard_type": "POTHOLE",
+        "severity": "HIGH",
+        "confidence_score": 0.84,
+        "visual_description": "Asphalt pavement cavity with exposed sub-base aggregate (~45cm diameter).",
+        "is_uncertain": false,
+        "provenance": "DETERMINISTIC_LOCAL_HEURISTIC_EVALUATION"
+      },
+      "image_snapshot": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iNDgwIiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgICA8cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgZmlsbD0iIzJiMmQzMCIvPgogICAgPCEtLSBBc3BoYWx0IHJvYWQgdGV4dHVyZSAtLT4KICAgIDxwYXRoIGQ9Ik0wLDAgTDY0MCwwIEw2NDAsNDgwIEwwLDQ4MCBaIiBmaWxsPSIjMzgzYTNkIi8+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iMCIgeDI9IjMyMCIgeTI9IjQ4MCIgc3Ryb2tlPSIjZDRhZjM3IiBzdHJva2UtZGFzaGFycmF5PSIyNSwyNSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgICA8IS0tIFBvdGhvbGUgY3JhdGVyIC0tPgogICAgPGVsbGlwc2UgY3g9IjM2MCIgY3k9IjI3MCIgcng9IjE0MCIgcnk9IjkwIiBmaWxsPSIjMTQxNTE3IiBzdHJva2U9IiMwYTBhMGIiIHN0cm9rZS13aWR0aD0iOCIvPgogICAgPGVsbGlwc2UgY3g9IjM3MCIgY3k9IjI4MCIgcng9IjkwIiByeT0iNTAiIGZpbGw9IiMwMDAwMDAiLz4KICAgIDwhLS0gQ3JhY2tzIC0tPgogICAgPHBhdGggZD0iTTIyMCwyNzAgTDE3MCwyNjAgTDE0MCwyODAgTTQ5MCwyNTAgTDU0MCwyNDAgTDU3MCwyNzAgTTM2MCwxODAgTDM1MCwxMzAiIHN0cm9rZT0iIzFjMWQxZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgICA8IS0tIFdhdGVyIC8gYWdncmVnYXRlIHJlZmxlY3Rpb24gLS0+CiAgICA8ZWxsaXBzZSBjeD0iMzUwIiBjeT0iMjg1IiByeD0iNDAiIHJ5PSIxNSIgZmlsbD0iIzNhNDA0YSIgb3BhY2l0eT0iMC42Ii8+CiAgICA8IS0tIEhVRCBPdmVybGF5IC0tPgogICAgPHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQ1IiBmaWxsPSJyZ2JhKDAsMCwwLDAuNzUpIiByeD0iNiIvPgogICAgPHRleHQgeD0iMzUiIHk9IjQ4IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjMDBmZmNjIiBmb250LXdlaWdodD0iYm9sZCI+TkFHQVItUk9WRVIgUE9WIC8vIENBTS0wMSBbV0FSRC00MiBXUC0wNF08L3RleHQ+CiAgICA8cmVjdCB4PSIyMCIgeT0iNDE1IiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQ1IiBmaWxsPSJyZ2JhKDAsMCwwLDAuNzUpIiByeD0iNiIvPgogICAgPHRleHQgeD0iMzUiIHk9IjQ0MyIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmNTU1NSI+U2V2ZXJlIFJvYWQgQ2F2aXR5IHwgSVJDOlNQOjk4PC90ZXh0PgogIDwvc3ZnPg=="
+    },
+    {
+      "id": "OBS-1791263721249-920",
+      "timestamp": "2026-10-06T05:15:21.249Z",
+      "waypoint_id": "WP-05",
+      "waypoint_name": "Storm-Drain Culvert Junction",
+      "coords": [
+        12.9732,
+        77.645
+      ],
+      "source": "ROVER_CAM_01",
+      "ai_result": {
+        "success": true,
+        "model_used": "qwen2.5vl:3b (Local Edge Ollama)",
+        "latency_ms": 6414,
+        "inference_type": "LOCAL_EDGE_VLM",
+        "detected": false,
+        "hazard_type": "CLEAN_ROAD",
+        "severity": "LOW",
+        "confidence_score": 0.95,
+        "visual_description": "The road surface appears smooth and without any significant defects.",
+        "is_uncertain": false,
+        "provenance": "LOCAL_ON_DEVICE_INFERENCE_ZERO_CLOUD_TRANSFER"
+      },
+      "image_snapshot": "data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    },
     {
       "id": "OBS-001",
       "timestamp": "2026-10-05T23:19:58.048Z",
@@ -53,6 +103,51 @@
   ],
   "issues": [
     {
+      "id": "ISS-0003",
+      "created_at": "2026-10-06T05:15:36.231Z",
+      "status": "VERIFIED",
+      "duplicate_candidates": [
+        {
+          "candidate_issue_id": "ISS-0001",
+          "distance_meters": 0,
+          "same_hazard_type": true,
+          "match_confidence": 1,
+          "current_status": "VERIFIED",
+          "created_at": "2026-10-05T23:19:58.044Z",
+          "is_historical_recurrence": true,
+          "note": "Recurring defect at exact historical location (0m from previous resolved ticket)"
+        }
+      ],
+      "work_order_id": "WO-736231",
+      "verification_verdict": "VERIFIED",
+      "verification_notes": "Verified complete asphalt compaction and level pavement profile per IRC:SP:98.",
+      "verification_timestamp": "2026-10-06T05:15:47.753Z",
+      "reinspection_evidence": null,
+      "hazard_type": "POTHOLE",
+      "severity": "HIGH",
+      "confidence_score": 0.84,
+      "visual_description": "Asphalt pavement cavity with exposed sub-base aggregate (~45cm diameter).",
+      "is_uncertain": false,
+      "waypoint_id": "WP-04",
+      "waypoint_name": "Hospital Flyover Base - Left Carriage",
+      "coords": [
+        12.9745,
+        77.6438
+      ],
+      "pos3d": {
+        "x": 25,
+        "y": 0,
+        "z": 20
+      },
+      "primary_evidence_image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iNDgwIiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+CiAgICA8cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgZmlsbD0iIzJiMmQzMCIvPgogICAgPCEtLSBBc3BoYWx0IHJvYWQgdGV4dHVyZSAtLT4KICAgIDxwYXRoIGQ9Ik0wLDAgTDY0MCwwIEw2NDAsNDgwIEwwLDQ4MCBaIiBmaWxsPSIjMzgzYTNkIi8+CiAgICA8bGluZSB4MT0iMzIwIiB5MT0iMCIgeDI9IjMyMCIgeTI9IjQ4MCIgc3Ryb2tlPSIjZDRhZjM3IiBzdHJva2UtZGFzaGFycmF5PSIyNSwyNSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CiAgICA8IS0tIFBvdGhvbGUgY3JhdGVyIC0tPgogICAgPGVsbGlwc2UgY3g9IjM2MCIgY3k9IjI3MCIgcng9IjE0MCIgcnk9IjkwIiBmaWxsPSIjMTQxNTE3IiBzdHJva2U9IiMwYTBhMGIiIHN0cm9rZS13aWR0aD0iOCIvPgogICAgPGVsbGlwc2UgY3g9IjM3MCIgY3k9IjI4MCIgcng9IjkwIiByeT0iNTAiIGZpbGw9IiMwMDAwMDAiLz4KICAgIDwhLS0gQ3JhY2tzIC0tPgogICAgPHBhdGggZD0iTTIyMCwyNzAgTDE3MCwyNjAgTDE0MCwyODAgTTQ5MCwyNTAgTDU0MCwyNDAgTDU3MCwyNzAgTTM2MCwxODAgTDM1MCwxMzAiIHN0cm9rZT0iIzFjMWQxZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgICA8IS0tIFdhdGVyIC8gYWdncmVnYXRlIHJlZmxlY3Rpb24gLS0+CiAgICA8ZWxsaXBzZSBjeD0iMzUwIiBjeT0iMjg1IiByeD0iNDAiIHJ5PSIxNSIgZmlsbD0iIzNhNDA0YSIgb3BhY2l0eT0iMC42Ii8+CiAgICA8IS0tIEhVRCBPdmVybGF5IC0tPgogICAgPHJlY3QgeD0iMjAiIHk9IjIwIiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQ1IiBmaWxsPSJyZ2JhKDAsMCwwLDAuNzUpIiByeD0iNiIvPgogICAgPHRleHQgeD0iMzUiIHk9IjQ4IiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjE2IiBmaWxsPSIjMDBmZmNjIiBmb250LXdlaWdodD0iYm9sZCI+TkFHQVItUk9WRVIgUE9WIC8vIENBTS0wMSBbV0FSRC00MiBXUC0wNF08L3RleHQ+CiAgICA8cmVjdCB4PSIyMCIgeT0iNDE1IiB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQ1IiBmaWxsPSJyZ2JhKDAsMCwwLDAuNzUpIiByeD0iNiIvPgogICAgPHRleHQgeD0iMzUiIHk9IjQ0MyIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2ZmNTU1NSI+U2V2ZXJlIFJvYWQgQ2F2aXR5IHwgSVJDOlNQOjk4PC90ZXh0PgogIDwvc3ZnPg==",
+      "source_device": "ROVER_CAM_01",
+      "ai_model": "NAGAR-BOT Heuristic Vision Engine (Demo Fallback)",
+      "ward_id": "WARD-42",
+      "demo_provenance": "DEMO DATA: Canonical Simulation Geometry - Zero Private GPS Collected",
+      "updated_at": "2026-10-06T05:15:47.753Z",
+      "verified_by_officer": "Executive Engineer (Quality Audit)"
+    },
+    {
       "id": "ISS-0001",
       "created_at": "2026-10-05T23:19:58.044Z",
       "status": "VERIFIED",
@@ -89,9 +184,9 @@
       "reinspection_notes": "Automated verification pass confirmed level pavement profile.",
       "verification_verdict": "VERIFIED",
       "verification_notes": "High-quality polymer cold mix asphalt verified with level compactor finish.",
-      "verification_timestamp": "2026-10-06T04:23:48.796Z",
+      "verification_timestamp": "2026-10-06T04:20:18.634Z",
       "verified_by_officer": "Chief Quality Auditor (Test)",
-      "updated_at": "2026-10-06T04:23:48.796Z"
+      "updated_at": "2026-10-06T04:20:18.634Z"
     },
     {
       "id": "ISS-0002",
@@ -123,6 +218,57 @@
     }
   ],
   "work_orders": [
+    {
+      "id": "WO-736231",
+      "created_at": "2026-10-06T05:15:36.231Z",
+      "status": "CLOSED",
+      "issue_id": "ISS-0003",
+      "ward_id": "WARD-42",
+      "ward_name": "Ward 42 (Indiranagar - Central Corridor)",
+      "department": "Road Infrastructure & Public Works Department (PWD)",
+      "department_code": "PWD",
+      "lead_officer": "Er. K. S. Murthy (AEE Road Maintenance)",
+      "officer_contact": "pwd-ward42@ulb.gov.in.demo",
+      "hazard_type": "POTHOLE",
+      "severity": "HIGH",
+      "location_summary": "Hospital Flyover Base - Left Carriage (Waypoint: WP-04)",
+      "coords": [
+        12.9745,
+        77.6438
+      ],
+      "assigned_contractor_id": "CONT-PWD-01",
+      "assigned_contractor_name": "Shri Balaji Roadworks Ltd.",
+      "contractor_rating": 4.4,
+      "sla_resolution_hours": 48,
+      "target_completion_deadline": "2026-10-08T05:15:36.231Z",
+      "itemized_budget": [
+        {
+          "item": "Cold-Mix Bituminous Polymer Concrete (Grade VG-30)",
+          "qty": "120 Kg",
+          "cost_inr": 3600
+        },
+        {
+          "item": "Tack Coat Bitumen Emulsion Application",
+          "qty": "15 Litres",
+          "cost_inr": 1200
+        },
+        {
+          "item": "Vibratory Plate Compactor & Labor Crew",
+          "qty": "1 Shift",
+          "cost_inr": 2500
+        },
+        {
+          "item": "Reflective Road Warning Cones & Barricades",
+          "qty": "4 Units",
+          "cost_inr": 500
+        }
+      ],
+      "estimated_total_cost_inr": 7800,
+      "execution_notes": "Execute repair following Indian Road Congress (IRC:SP:98-2020) cold-patching specifications. Upload geo-tagged follow-up verification photograph upon completion.",
+      "audit_verdict": "VERIFIED",
+      "closed_at": "2026-10-06T05:15:47.753Z",
+      "updated_at": "2026-10-06T05:15:47.753Z"
+    },
     {
       "id": "WO-984201",
       "issue_id": "ISS-0001",
@@ -220,6 +366,51 @@
     }
   ],
   "audit_logs": [
+    {
+      "audit_id": "AUD-1791263747753-10",
+      "timestamp": "2026-10-06T05:15:47.753Z",
+      "entity_id": "ISS-0003",
+      "action": "WO_CLOSED",
+      "actor": "Executive Engineer (Quality Audit)",
+      "details": "Audit verdict rendered: VERIFIED. Reason: Verified complete asphalt compaction and level pavement profile per IRC:SP:98.",
+      "immutable_hash": "SHA256:MTc5MTI2Mzc0Nzc1"
+    },
+    {
+      "audit_id": "AUD-1791263747753-496",
+      "timestamp": "2026-10-06T05:15:47.753Z",
+      "entity_id": "ISS-0003",
+      "action": "STATUS_VERIFIED",
+      "actor": "Executive Engineer (Quality Audit)",
+      "details": "Verified complete asphalt compaction and level pavement profile per IRC:SP:98.",
+      "immutable_hash": "SHA256:MTc5MTI2Mzc0Nzc1"
+    },
+    {
+      "audit_id": "AUD-1791263736231-757",
+      "timestamp": "2026-10-06T05:15:36.231Z",
+      "entity_id": "ISS-0003",
+      "action": "STATUS_DRAFTED",
+      "actor": "SYSTEM",
+      "details": "Draft Work Order WO-736231 attached.",
+      "immutable_hash": "SHA256:MTc5MTI2MzczNjIz"
+    },
+    {
+      "audit_id": "AUD-1791263736231-986",
+      "timestamp": "2026-10-06T05:15:36.231Z",
+      "entity_id": "ISS-0003",
+      "action": "WORK_ORDER_DRAFTED",
+      "actor": "MUNICIPAL_DISPATCH",
+      "details": "Draft Work Order WO-736231 created for department Road Infrastructure & Public Works Department (PWD)",
+      "immutable_hash": "SHA256:MTc5MTI2MzczNjIz"
+    },
+    {
+      "audit_id": "AUD-1791263736231-236",
+      "timestamp": "2026-10-06T05:15:36.231Z",
+      "entity_id": "ISS-0003",
+      "action": "ISSUE_DETECTED",
+      "actor": "SYSTEM_OBSERVER",
+      "details": "New civic hazard logged at waypoint WP-04",
+      "immutable_hash": "SHA256:MTc5MTI2MzczNjIz"
+    },
     {
       "audit_id": "AUD-1791260418634-585",
       "timestamp": "2026-10-06T04:20:18.634Z",
