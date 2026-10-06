@@ -110,7 +110,12 @@
         </div>
 
         <div class="upload-fallback-area" id="upload-panel" style="display:none;">
-          <input type="file" id="manual-file-input" accept="image/*" onchange="window.handleManualFileUpload(event)">
+          <div style="display:flex; gap:8px; margin-bottom:8px; align-items:center;">
+            <input type="file" id="manual-file-input" accept="image/*" onchange="window.handleManualFileUpload(event)" style="display:none;">
+            <button class="btn btn-sm btn-primary" onclick="document.getElementById('manual-file-input').click()">📁 Choose File</button>
+            <input type="file" id="mobile-cam-input" accept="image/*" capture="environment" onchange="window.handleManualFileUpload(event)" style="display:none;">
+            <button class="btn btn-sm btn-success" onclick="document.getElementById('mobile-cam-input').click()">📸 Open Phone Back Camera</button>
+          </div>
           <div class="upload-presets">
             <span>Quick Test Samples:</span>
             <button class="btn-chip" onclick="window.loadPresetSample('POTHOLE')">🕳️ Severe Pothole (WP-04)</button>
