@@ -1,7 +1,9 @@
-// NAGAR-BOT: Core Express & WebSocket Server
+// NAGAR-BOT: Core Express, HTTPS & WebSocket Server
 import express from 'express';
 import cors from 'cors';
 import http from 'http';
+import https from 'https';
+import fs from 'fs';
 import path from 'path';
 import { WebSocketServer, WebSocket } from 'ws';
 import { fileURLToPath } from 'url';
@@ -16,8 +18,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const server = http.createServer(app);
-const PORT = process.env.PORT || 3000;
+const PORT_HTTP = process.env.PORT || 3000;
+const PORT_HTTPS = process.env.PORT_HTTPS || 3443;
 
 app.use(cors());
 app.use(express.json({ limit: '25mb' }));
@@ -47,22 +49,41 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(frontendDir, 'index.html'));
 });
 
-// --- WEBSOCKET SERVER FOR REAL-TIME MOBILE CAMERA STREAMING ---
-const wss = new WebSocketServer({ server, path: '/ws/camera' });
+// 1. Create HTTP Server
+const httpServer = http.createServer(app);
+
+// 2. Create HTTPS Server (for secure mobile camera access)
+let httpsServer = null;
+const keyPath = path.join(__dirname, '../../key.pem');
+const certPath = path.join(__dirname, '../../cert.pem');
+
+if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+  try {
+    const sslOptions = {
+      key: fs.readFileSync(keyPath),
+      cert: fs.readFileSync(certPath)
+    };
+    httpsServer = https.createServer(sslOptions, app);
+  } catch (e) {
+    console.warn("[HTTPS] Could not initialize SSL server:", e.message);
+  }
+}
+
+// 3. WebSocket Hub for both HTTP and HTTPS
 const dashboardClients = new Set();
 let isProcessingFrame = false;
 let lastDetectionTime = 0;
 
-wss.on('connection', (ws, req) => {
+function handleWsConnection(ws) {
   dashboardClients.add(ws);
-  console.log(`[WebSocket] New camera/dashboard client connected. Total clients: ${dashboardClients.size}`);
+  console.log(`[WebSocket] Client connected. Total active clients: ${dashboardClients.size}`);
 
   ws.on('message', async (data) => {
     try {
       const msg = JSON.parse(data.toString());
 
       if (msg.type === "ROVER_FRAME") {
-        // 1. Broadcast live video frame to all connected laptop dashboards
+        // Broadcast live frame to dashboard
         const payload = JSON.stringify({
           type: "LIVE_FRAME_BROADCAST",
           image_base64: msg.image_base64,
@@ -75,20 +96,18 @@ wss.on('connection', (ws, req) => {
           }
         }
 
-        // 2. Continuous AI Detection (Rate limited to 1 frame every 3.5 seconds to prevent GPU overload)
+        // Run AI detection (rate limited)
         const now = Date.now();
-        if (!isProcessingFrame && (now - lastDetectionTime > 3500)) {
+        if (!isProcessingFrame && (now - lastDetectionTime > 3000)) {
           isProcessingFrame = true;
           lastDetectionTime = now;
 
           const wpId = store.state.rover_telemetry.current_waypoint_id || "WP-04";
           const wp = CANONICAL_WAYPOINTS.find(w => w.id === wpId) || CANONICAL_WAYPOINTS[0];
 
-          // Run Edge VLM
           analyzeFrameWithVLM(msg.image_base64, { waypoint_id: wp.id }).then(aiResult => {
             isProcessingFrame = false;
 
-            // Broadcast AI result overlay
             const aiPayload = JSON.stringify({
               type: "LIVE_AI_RESULT",
               ai_result: aiResult,
@@ -98,7 +117,6 @@ wss.on('connection', (ws, req) => {
               if (client.readyState === WebSocket.OPEN) client.send(aiPayload);
             }
 
-            // If defect detected, record issue and draft work order
             if (aiResult.detected && aiResult.hazard_type !== "CLEAN_ROAD") {
               const duplicates = findDuplicateCandidates({
                 coords: wp.coords,
@@ -145,15 +163,32 @@ wss.on('connection', (ws, req) => {
 
   ws.on('close', () => {
     dashboardClients.delete(ws);
-    console.log(`[WebSocket] Client disconnected. Active clients: ${dashboardClients.size}`);
+    console.log(`[WebSocket] Client disconnected. Active: ${dashboardClients.size}`);
   });
-});
+}
 
-server.listen(PORT, () => {
+// Bind WS on HTTP
+const wssHttp = new WebSocketServer({ server: httpServer, path: '/ws/camera' });
+wssHttp.on('connection', handleWsConnection);
+
+// Bind WS on HTTPS if enabled
+if (httpsServer) {
+  const wssHttps = new WebSocketServer({ server: httpsServer, path: '/ws/camera' });
+  wssHttps.on('connection', handleWsConnection);
+}
+
+// Start HTTP
+httpServer.listen(PORT_HTTP, () => {
   console.log(`\n=============================================================`);
   console.log(`  NAGAR-BOT Civic Intelligence & Accountability System`);
-  console.log(`  MY Bharat Hack for Social Cause (VBYLD 2027)`);
-  console.log(`  Dashboard URL:   http://localhost:${PORT}`);
-  console.log(`  Phone Streamer:  http://10.50.195.37:${PORT}/camera.html`);
-  console.log(`=============================================================\n`);
+  console.log(`  Dashboard (Laptop): http://localhost:${PORT_HTTP}`);
+  console.log(`  Phone (HTTP Snap):  http://10.50.195.37:${PORT_HTTP}/camera.html`);
 });
+
+// Start HTTPS
+if (httpsServer) {
+  httpsServer.listen(PORT_HTTPS, () => {
+    console.log(`  Phone (HTTPS Video): https://10.50.195.37:${PORT_HTTPS}/camera.html`);
+    console.log(`=============================================================\n`);
+  });
+}
