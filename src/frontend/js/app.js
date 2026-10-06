@@ -1,7 +1,9 @@
-// NAGAR-BOT: Unified Client Application with Live Mobile Streaming & Auto-Detect
+// NAGAR-BOT: Master Command Center Script (Zero-Crash, Bulletproof Video & WebSocket Stream)
 
 (function() {
-  console.log("[NAGAR-BOT] Initializing live streaming & detection engine...");
+  console.log("[NAGAR-BOT] Booting command center engine...");
+
+  const isHttps = window.location.protocol === "https:";
 
   // --- 1. TOPOLOGY & DATA ---
   const WARD_METADATA = {
@@ -50,42 +52,26 @@
   let autoSweepTimer = null;
   let activeModalIssueId = null;
   let currentPresetBase64 = null;
-  let currentVideoSource = 'PHONE_STREAM'; // Default to live phone stream
+  let currentVideoSource = 'PHONE_STREAM';
   let webcamStream = null;
   let cameraSocket = null;
   let latestPhoneFrame = null;
 
-  // --- AUDIO ALERT BEEP ---
+  // --- AUDIO ALERT CHIME ---
   function playAlertBeep(isHazard = true) {
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = isHazard ? 'sawtooth' : 'sine';
-      osc.frequency.setValueAtTime(isHazard ? 580 : 880, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(isHazard ? 520 : 880, audioCtx.currentTime);
       gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start();
-      osc.stop(audioCtx.currentTime + 0.35);
+      osc.stop(audioCtx.currentTime + 0.3);
     } catch (e) {}
-  }
-
-  // --- SAMPLE SVGS ---
-  function getPotholeSvgDataUri(title = "BEFORE: Deep Pothole (Pre-Repair)") {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><rect width="640" height="480" fill="#22252a"/><path d="M0,0 L640,0 L640,480 L0,480 Z" fill="#2d3138"/><line x1="320" y1="0" x2="320" y2="480" stroke="#f59e0b" stroke-dasharray="25,25" stroke-width="6"/><ellipse cx="360" cy="270" rx="140" ry="90" fill="#141517" stroke="#0a0a0b" stroke-width="8"/><ellipse cx="370" cy="280" rx="90" ry="50" fill="#000000"/><rect x="20" y="20" width="600" height="45" fill="rgba(0,0,0,0.8)" rx="6"/><text x="35" y="48" font-family="monospace" font-size="16" fill="#00d2b4" font-weight="bold">NAGAR-ROVER POV // CAM-01 [WP-04]</text><rect x="20" y="415" width="600" height="45" fill="rgba(0,0,0,0.8)" rx="6"/><text x="35" y="443" font-family="monospace" font-size="14" fill="#ef4444">${title} | IRC:SP:98</text></svg>`;
-    return `data:image/svg+xml;base64,${btoa(svg)}`;
-  }
-
-  function getRepairedSvgDataUri() {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><rect width="640" height="480" fill="#22252a"/><path d="M0,0 L640,0 L640,480 L0,480 Z" fill="#2d3138"/><line x1="320" y1="0" x2="320" y2="480" stroke="#f59e0b" stroke-dasharray="25,25" stroke-width="6"/><ellipse cx="360" cy="270" rx="150" ry="100" fill="#1f2022" stroke="#2c2d30" stroke-width="6"/><rect x="20" y="20" width="600" height="45" fill="rgba(0,0,0,0.8)" rx="6"/><text x="35" y="48" font-family="monospace" font-size="16" fill="#00d2b4" font-weight="bold">CONTRACTOR REPAIR EVIDENCE // CONT-PWD-01</text><rect x="20" y="415" width="600" height="45" fill="rgba(0,0,0,0.8)" rx="6"/><text x="35" y="443" font-family="monospace" font-size="14" fill="#10b981">COMPLETED: Cold-Mix Poly-Asphalt Compaction</text></svg>`;
-    return `data:image/svg+xml;base64,${btoa(svg)}`;
-  }
-
-  function getGarbageSvgDataUri() {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><rect width="640" height="480" fill="#2b2d30"/><rect x="0" y="240" width="640" height="240" fill="#3a3e45"/><ellipse cx="380" cy="310" rx="160" ry="80" fill="#3d372e"/><circle cx="340" cy="280" r="35" fill="#4a7c59"/><circle cx="410" cy="290" r="40" fill="#2d5d7b"/><rect x="20" y="20" width="600" height="45" fill="rgba(0,0,0,0.8)" rx="6"/><text x="35" y="48" font-family="monospace" font-size="16" fill="#00d2b4" font-weight="bold">NAGAR-ROVER POV // CAM-01 [WP-03]</text><rect x="20" y="415" width="600" height="45" fill="rgba(0,0,0,0.8)" rx="6"/><text x="35" y="443" font-family="monospace" font-size="14" fill="#f59e0b">HAZARD: Solid Waste Heap (>150kg) | SWM Div</text></svg>`;
-    return `data:image/svg+xml;base64,${btoa(svg)}`;
   }
 
   // --- TOASTS ---
@@ -114,68 +100,6 @@
     }
   }
 
-  // --- WEBSOCKET FOR PHONE LIVE STREAMING ---
-  function initCameraWebSocket() {
-    const loc = window.location;
-    const wsProto = loc.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${wsProto}//${loc.host}/ws/camera`;
-
-    cameraSocket = new WebSocket(wsUrl);
-
-    cameraSocket.onopen = () => {
-      console.log("[WebSocket] Connected to camera streaming hub.");
-    };
-
-    cameraSocket.onmessage = (e) => {
-      try {
-        const msg = JSON.parse(e.data);
-
-        // 1. Live video frame broadcast from phone
-        if (msg.type === "LIVE_FRAME_BROADCAST") {
-          latestPhoneFrame = msg.image_base64;
-          const staticImg = document.getElementById('rover-static-view');
-          const video = document.getElementById('rover-video');
-          const indicator = document.getElementById('phone-conn-indicator');
-
-          if (indicator) {
-            indicator.innerText = "🟢 Phone Streaming LIVE";
-            indicator.style.color = "#10b981";
-          }
-
-          if (currentVideoSource === 'PHONE_STREAM') {
-            if (video) video.style.display = 'none';
-            if (staticImg) {
-              staticImg.style.display = 'block';
-              staticImg.src = msg.image_base64;
-            }
-          }
-        // 2. Real-time AI detection result from phone stream
-        else if (msg.type === "LIVE_AI_RESULT") {
-          const ai = msg.ai_result;
-          const banner = document.getElementById('hud-detection-banner');
-          const latencyEl = document.getElementById('hud-latency');
-          const modelEl = document.getElementById('hud-model-tag');
-
-          if (latencyEl) latencyEl.innerText = `LATENCY: ${ai.latency_ms}ms`;
-          if (modelEl) modelEl.innerText = `MODEL: ${ai.model_used.split(' ')[0]}`;
-
-          if (ai.detected && ai.hazard_type !== "CLEAN_ROAD") {
-            if (banner) {
-              banner.className = 'hud-alert hud-alert-detected';
-              banner.innerText = `🚨 LIVE: ${ai.hazard_type} DETECTED (${(ai.confidence_score * 100).toFixed(0)}%) -> TICKET CREATED`;
-            }
-            renderBoundingBox(ai.bounding_box, ai.hazard_type, ai.confidence_score);
-            playAlertBeep(true);
-            showToast(`Live Detection: ${ai.hazard_type} at ${msg.waypoint ? msg.waypoint.id : 'Active Point'}`, 'alert');
-          } else {
-            if (banner) {
-              banner.className = 'hud-alert';
-              banner.innerText = '✅ LIVE: ROAD SURFACE NORMAL';
-            }
-            clearBoundingBox();
-          }
-        }
-
   // --- BOUNDING BOX RENDERER ---
   function renderBoundingBox(bbox, hazardType, confidence) {
     const canvas = document.getElementById('bbox-overlay-canvas');
@@ -195,14 +119,14 @@
     const [ymin, xmin, ymax, xmax] = bbox;
     const top = (ymin / 1000) * h;
     const left = (xmin / 1000) * w;
-    const boxW = Math.max(40, ((xmax - xmin) / 1000) * w);
-    const boxH = Math.max(30, ((ymax - ymin) / 1000) * h);
+    const boxW = Math.max(50, ((xmax - xmin) / 1000) * w);
+    const boxH = Math.max(40, ((ymax - ymin) / 1000) * h);
 
     const isPothole = hazardType === 'POTHOLE';
     const color = isPothole ? '#ef4444' : '#f59e0b';
 
     // 1. Translucent fill
-    ctx.fillStyle = isPothole ? 'rgba(239, 68, 68, 0.18)' : 'rgba(245, 158, 11, 0.18)';
+    ctx.fillStyle = isPothole ? 'rgba(239, 68, 68, 0.20)' : 'rgba(245, 158, 11, 0.20)';
     ctx.fillRect(left, top, boxW, boxH);
 
     // 2. Dashed inner box
@@ -212,40 +136,28 @@
     ctx.strokeRect(left, top, boxW, boxH);
     ctx.setLineDash([]);
 
-    // 3. High-contrast solid cyber corner brackets
+    // 3. Cyber Corner Brackets
     const cornerLen = Math.min(24, Math.min(boxW, boxH) * 0.35);
     ctx.lineWidth = 4;
     ctx.strokeStyle = '#ffffff';
 
-    // Top-Left
     ctx.beginPath();
-    ctx.moveTo(left, top + cornerLen);
-    ctx.lineTo(left, top);
-    ctx.lineTo(left + cornerLen, top);
+    ctx.moveTo(left, top + cornerLen); ctx.lineTo(left, top); ctx.lineTo(left + cornerLen, top);
     ctx.stroke();
 
-    // Top-Right
     ctx.beginPath();
-    ctx.moveTo(left + boxW - cornerLen, top);
-    ctx.lineTo(left + boxW, top);
-    ctx.lineTo(left + boxW, top + cornerLen);
+    ctx.moveTo(left + boxW - cornerLen, top); ctx.lineTo(left + boxW, top); ctx.lineTo(left + boxW, top + cornerLen);
     ctx.stroke();
 
-    // Bottom-Left
     ctx.beginPath();
-    ctx.moveTo(left, top + boxH - cornerLen);
-    ctx.lineTo(left, top + boxH);
-    ctx.lineTo(left + cornerLen, top + boxH);
+    ctx.moveTo(left, top + boxH - cornerLen); ctx.lineTo(left, top + boxH); ctx.lineTo(left + cornerLen, top + boxH);
     ctx.stroke();
 
-    // Bottom-Right
     ctx.beginPath();
-    ctx.moveTo(left + boxW - cornerLen, top + boxH);
-    ctx.lineTo(left + boxW, top + boxH);
-    ctx.lineTo(left + boxW, top + boxH - cornerLen);
+    ctx.moveTo(left + boxW - cornerLen, top + boxH); ctx.lineTo(left + boxW, top + boxH); ctx.lineTo(left + boxW, top + boxH - cornerLen);
     ctx.stroke();
 
-    // 4. Center Crosshairs Target
+    // 4. Center Crosshairs
     const cx = left + boxW / 2;
     const cy = top + boxH / 2;
     ctx.lineWidth = 2;
@@ -274,42 +186,102 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
   }
-      } catch (err) {}
-    };
 
-    cameraSocket.onclose = () => {
-      setTimeout(initCameraWebSocket, 3000);
-    };
+  // --- WEBSOCKET CONNECTION FOR PHONE STREAM ---
+  function initCameraWebSocket() {
+    try {
+      const loc = window.location;
+      const wsProto = isHttps ? "wss:" : "ws:";
+      const wsUrl = `${wsProto}//${loc.host}/ws/camera`;
+
+      cameraSocket = new WebSocket(wsUrl);
+
+      cameraSocket.onopen = () => {
+        console.log("[WebSocket] Connected to camera hub.");
+      };
+
+      cameraSocket.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+
+          // 1. LIVE FRAME BROADCAST FROM PHONE
+          if (msg.type === "LIVE_FRAME_BROADCAST") {
+            latestPhoneFrame = msg.image_base64;
+            const staticImg = document.getElementById('rover-static-view');
+            const video = document.getElementById('rover-video');
+            const indicator = document.getElementById('phone-conn-indicator');
+
+            if (indicator) {
+              indicator.innerText = "🟢 Phone Streaming LIVE";
+              indicator.style.color = "#10b981";
+            }
+
+            // Immediately display frame in Rover panel
+            if (staticImg) {
+              staticImg.src = msg.image_base64;
+              staticImg.style.display = 'block';
+            }
+            if (video) {
+              video.style.display = 'none';
+            }
+          }
+
+          // 2. LIVE AI RESULT FROM PHONE STREAM
+          else if (msg.type === "LIVE_AI_RESULT") {
+            const ai = msg.ai_result;
+            const banner = document.getElementById('hud-detection-banner');
+            const latencyEl = document.getElementById('hud-latency');
+            const modelEl = document.getElementById('hud-model-tag');
+
+            if (latencyEl) latencyEl.innerText = `LATENCY: ${ai.latency_ms}ms`;
+            if (modelEl) modelEl.innerText = `MODEL: ${ai.model_used.split(' ')[0]}`;
+
+            if (ai.detected && ai.hazard_type !== "CLEAN_ROAD") {
+              if (banner) {
+                banner.className = 'hud-alert hud-alert-detected';
+                banner.innerText = `🚨 LIVE: ${ai.hazard_type} DETECTED (${(ai.confidence_score * 100).toFixed(0)}%) -> TICKET CREATED`;
+              }
+              renderBoundingBox(ai.bounding_box, ai.hazard_type, ai.confidence_score);
+              playAlertBeep(true);
+              showToast(`Live Detection: ${ai.hazard_type}`, 'alert');
+            } else {
+              if (banner) {
+                banner.className = 'hud-alert';
+                banner.innerText = '✅ LIVE: ROAD SURFACE NORMAL';
+              }
+              clearBoundingBox();
+            }
+          }
+        } catch (err) {
+          console.warn("[WebSocket] msg parse error:", err);
+        }
+      };
+
+      cameraSocket.onclose = () => {
+        const indicator = document.getElementById('phone-conn-indicator');
+        if (indicator) {
+          indicator.innerText = "Awaiting Phone...";
+          indicator.style.color = "#f59e0b";
+        }
+        setTimeout(initCameraWebSocket, 3000);
+      };
+
+      cameraSocket.onerror = (err) => {
+        console.warn("[WebSocket] Error:", err);
+      };
+    } catch (e) {
+      console.warn("[WebSocket] Init error:", e);
+    }
   }
 
-  // --- CAMERA & FRAME EXTRACTION ---
-  function captureCurrentFrameBase64() {
-    if (currentVideoSource === 'PHONE_STREAM' && latestPhoneFrame) {
-      return latestPhoneFrame;
-    }
-    if (currentVideoSource === 'UPLOAD' && currentPresetBase64) {
-      return currentPresetBase64;
-    }
-
-    const canvas = document.createElement('canvas');
-    canvas.width = 640;
-    canvas.height = 480;
-    const ctx = canvas.getContext('2d');
-    const video = document.getElementById('rover-video');
-
-    if (currentVideoSource === 'WEBCAM' && video && video.videoWidth > 0) {
-      ctx.drawImage(video, 0, 0, 640, 480);
-    } else if (simCanvas) {
-      ctx.drawImage(simCanvas, 0, 0, 640, 480);
-    } else {
-      const wp = appState.telemetry.current_waypoint_id;
-      return wp === 'WP-03' ? getGarbageSvgDataUri() : (wp === 'WP-04' ? getPotholeSvgDataUri() : getRepairedSvgDataUri());
-    }
-    return canvas.toDataURL('image/jpeg', 0.85);
-  }
-
+  // --- ROAD SIMULATION ENGINE ---
   function startSimulation() {
     const video = document.getElementById('rover-video');
+    const staticImg = document.getElementById('rover-static-view');
+
+    if (staticImg) staticImg.style.display = 'none';
+    if (video) video.style.display = 'block';
+
     if (!simCanvas) {
       simCanvas = document.createElement('canvas');
       simCanvas.width = 640;
@@ -368,49 +340,78 @@
     } catch (e) {}
   }
 
+  function captureCurrentFrameBase64() {
+    if (latestPhoneFrame) {
+      return latestPhoneFrame;
+    }
+    if (currentPresetBase64) {
+      return currentPresetBase64;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = 480;
+    const ctx = canvas.getContext('2d');
+    const video = document.getElementById('rover-video');
+
+    if (currentVideoSource === 'WEBCAM' && video && video.videoWidth > 0) {
+      ctx.drawImage(video, 0, 0, 640, 480);
+    } else if (simCanvas) {
+      ctx.drawImage(simCanvas, 0, 0, 640, 480);
+    } else {
+      ctx.fillStyle = '#222';
+      ctx.fillRect(0, 0, 640, 480);
+    }
+    return canvas.toDataURL('image/jpeg', 0.85);
+  }
+
   // --- 2D GIS MAP ---
   function initMap2D() {
-    const el = document.getElementById('map-2d-container');
-    if (!el || typeof L === 'undefined' || map2d) return;
+    try {
+      const el = document.getElementById('map-2d-container');
+      if (!el || typeof L === 'undefined' || map2d) return;
 
-    map2d = L.map('map-2d-container', {
-      center: [12.9745, 77.6438],
-      zoom: 15,
-      zoomControl: false,
-      attributionControl: false
-    });
+      map2d = L.map('map-2d-container', {
+        center: [12.9745, 77.6438],
+        zoom: 15,
+        zoomControl: false,
+        attributionControl: false
+      });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-      subdomains: 'abcd'
-    }).addTo(map2d);
-
-    L.control.zoom({ position: 'bottomright' }).addTo(map2d);
-
-    const latlngs = CANONICAL_WAYPOINTS.map(wp => wp.coords);
-    L.polyline(latlngs, { color: '#00d2b4', weight: 4, opacity: 0.8, dashArray: '8, 8' }).addTo(map2d);
-
-    CANONICAL_WAYPOINTS.forEach(wp => {
-      const circle = L.circleMarker(wp.coords, {
-        radius: 6,
-        fillColor: '#1e293b',
-        color: '#00d2b4',
-        weight: 2,
-        fillOpacity: 0.9
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        subdomains: 'abcd'
       }).addTo(map2d);
-      circle.bindTooltip(`<b>${wp.id}</b>: ${wp.name}`, { direction: 'top' });
-    });
 
-    map2dRoverMarker = L.marker([12.9784, 77.6408], {
-      icon: L.divIcon({
-        className: 'rover-map-icon',
-        html: `<div style="background:#00d2b4; width:16px; height:16px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 12px #00d2b4;"></div>`,
-        iconSize: [16, 16],
-        iconAnchor: [8, 8]
-      })
-    }).addTo(map2d);
+      L.control.zoom({ position: 'bottomright' }).addTo(map2d);
 
-    renderMap2DIssues();
+      const latlngs = CANONICAL_WAYPOINTS.map(wp => wp.coords);
+      L.polyline(latlngs, { color: '#00d2b4', weight: 4, opacity: 0.8, dashArray: '8, 8' }).addTo(map2d);
+
+      CANONICAL_WAYPOINTS.forEach(wp => {
+        const circle = L.circleMarker(wp.coords, {
+          radius: 6,
+          fillColor: '#1e293b',
+          color: '#00d2b4',
+          weight: 2,
+          fillOpacity: 0.9
+        }).addTo(map2d);
+        circle.bindTooltip(`<b>${wp.id}</b>: ${wp.name}`, { direction: 'top' });
+      });
+
+      map2dRoverMarker = L.marker([12.9784, 77.6408], {
+        icon: L.divIcon({
+          className: 'rover-map-icon',
+          html: `<div style="background:#00d2b4; width:16px; height:16px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 12px #00d2b4;"></div>`,
+          iconSize: [16, 16],
+          iconAnchor: [8, 8]
+        })
+      }).addTo(map2d);
+
+      renderMap2DIssues();
+    } catch (e) {
+      console.warn("[Map2D] Init error:", e);
+    }
   }
 
   function renderMap2DIssues() {
@@ -447,98 +448,102 @@
 
   // --- 3D WEBGL DIGITAL TWIN ---
   function initMap3D() {
-    const container = document.getElementById('canvas-3d-target');
-    if (!container || typeof THREE === 'undefined' || map3dScene) return;
+    try {
+      const container = document.getElementById('canvas-3d-target');
+      if (!container || typeof THREE === 'undefined' || map3dScene) return;
 
-    const width = container.clientWidth || 600;
-    const height = container.clientHeight || 400;
+      const width = container.clientWidth || 600;
+      const height = container.clientHeight || 400;
 
-    map3dScene = new THREE.Scene();
-    map3dScene.background = new THREE.Color(0x0a0e14);
-    map3dScene.fog = new THREE.FogExp2(0x0a0e14, 0.003);
+      map3dScene = new THREE.Scene();
+      map3dScene.background = new THREE.Color(0x0a0e14);
+      map3dScene.fog = new THREE.FogExp2(0x0a0e14, 0.003);
 
-    map3dCamera = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
-    map3dCamera.position.set(120, 180, 260);
-    map3dCamera.lookAt(40, 0, 40);
+      map3dCamera = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+      map3dCamera.position.set(120, 180, 260);
+      map3dCamera.lookAt(40, 0, 40);
 
-    map3dRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    map3dRenderer.setSize(width, height);
-    map3dRenderer.setPixelRatio(window.devicePixelRatio);
-    container.innerHTML = '';
-    container.appendChild(map3dRenderer.domElement);
+      map3dRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      map3dRenderer.setSize(width, height);
+      map3dRenderer.setPixelRatio(window.devicePixelRatio);
+      container.innerHTML = '';
+      container.appendChild(map3dRenderer.domElement);
 
-    map3dScene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    const dirLight = new THREE.DirectionalLight(0x00d2b4, 0.8);
-    dirLight.position.set(100, 200, 100);
-    map3dScene.add(dirLight);
+      map3dScene.add(new THREE.AmbientLight(0xffffff, 0.7));
+      const dirLight = new THREE.DirectionalLight(0x00d2b4, 0.8);
+      dirLight.position.set(100, 200, 100);
+      map3dScene.add(dirLight);
 
-    const grid = new THREE.GridHelper(600, 60, 0x1f293d, 0x141a29);
-    grid.position.y = -0.5;
-    map3dScene.add(grid);
+      const grid = new THREE.GridHelper(600, 60, 0x1f293d, 0x141a29);
+      grid.position.y = -0.5;
+      map3dScene.add(grid);
 
-    // Procedural Buildings
-    const buildingMat = new THREE.MeshLambertMaterial({ color: 0x172033 });
-    const wireMat = new THREE.LineBasicMaterial({ color: 0x22324f });
+      // Procedural Buildings
+      const buildingMat = new THREE.MeshLambertMaterial({ color: 0x172033 });
+      const wireMat = new THREE.LineBasicMaterial({ color: 0x22324f });
 
-    for (let x = -200; x <= 200; x += 50) {
-      for (let z = -200; z <= 200; z += 50) {
-        if (Math.abs(x - z * 0.7) < 35) continue;
-        const h = 15 + Math.abs(Math.sin(x * 0.05 + z * 0.03)) * 60;
-        const geo = new THREE.BoxGeometry(28, h, 28);
-        const mesh = new THREE.Mesh(geo, buildingMat);
-        mesh.position.set(x + (Math.sin(z) * 10), h / 2, z);
-        map3dScene.add(mesh);
+      for (let x = -200; x <= 200; x += 50) {
+        for (let z = -200; z <= 200; z += 50) {
+          if (Math.abs(x - z * 0.7) < 35) continue;
+          const h = 15 + Math.abs(Math.sin(x * 0.05 + z * 0.03)) * 60;
+          const geo = new THREE.BoxGeometry(28, h, 28);
+          const mesh = new THREE.Mesh(geo, buildingMat);
+          mesh.position.set(x + (Math.sin(z) * 10), h / 2, z);
+          map3dScene.add(mesh);
 
-        const edges = new THREE.EdgesGeometry(geo);
-        const line = new THREE.LineSegments(edges, wireMat);
-        line.position.copy(mesh.position);
-        map3dScene.add(line);
+          const edges = new THREE.EdgesGeometry(geo);
+          const line = new THREE.LineSegments(edges, wireMat);
+          line.position.copy(mesh.position);
+          map3dScene.add(line);
+        }
       }
-    }
 
-    // Road Ribbon
-    const roadMat = new THREE.MeshBasicMaterial({ color: 0x273142, side: THREE.DoubleSide });
-    const pts = CANONICAL_WAYPOINTS.map(wp => new THREE.Vector3(wp.pos3d.x, 0.2, wp.pos3d.z));
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p1 = pts[i];
-      const p2 = pts[i + 1];
-      const geom = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(p1.x - 8, 0.2, p1.z),
-        new THREE.Vector3(p1.x + 8, 0.2, p1.z),
-        new THREE.Vector3(p2.x + 8, 0.2, p2.z),
-        new THREE.Vector3(p2.x - 8, 0.2, p2.z),
-        new THREE.Vector3(p1.x - 8, 0.2, p1.z)
-      ]);
-      map3dScene.add(new THREE.Mesh(geom, roadMat));
-    }
-
-    // 3D Rover Mesh
-    const roverGroup = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 14), new THREE.MeshLambertMaterial({ color: 0x00d2b4 }));
-    body.position.y = 4;
-    roverGroup.add(body);
-    const mast = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 6), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    mast.position.set(0, 8, 2);
-    roverGroup.add(mast);
-
-    map3dRover = roverGroup;
-    map3dScene.add(roverGroup);
-
-    updateMap3DRover();
-    renderMap3DBeacons();
-
-    function animate() {
-      requestAnimationFrame(animate);
-      const t = Date.now() * 0.003;
-      map3dBeacons.forEach(b => {
-        b.scale.set(1 + Math.sin(t) * 0.2, 1 + Math.sin(t) * 0.2, 1 + Math.sin(t) * 0.2);
-        b.rotation.y += 0.02;
-      });
-      if (map3dRenderer && map3dScene && map3dCamera) {
-        map3dRenderer.render(map3dScene, map3dCamera);
+      // Road
+      const roadMat = new THREE.MeshBasicMaterial({ color: 0x273142, side: THREE.DoubleSide });
+      const pts = CANONICAL_WAYPOINTS.map(wp => new THREE.Vector3(wp.pos3d.x, 0.2, wp.pos3d.z));
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const geom = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(p1.x - 8, 0.2, p1.z),
+          new THREE.Vector3(p1.x + 8, 0.2, p1.z),
+          new THREE.Vector3(p2.x + 8, 0.2, p2.z),
+          new THREE.Vector3(p2.x - 8, 0.2, p2.z),
+          new THREE.Vector3(p1.x - 8, 0.2, p1.z)
+        ]);
+        map3dScene.add(new THREE.Mesh(geom, roadMat));
       }
+
+      // 3D Rover
+      const roverGroup = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.BoxGeometry(10, 5, 14), new THREE.MeshLambertMaterial({ color: 0x00d2b4 }));
+      body.position.y = 4;
+      roverGroup.add(body);
+      const mast = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 6), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+      mast.position.set(0, 8, 2);
+      roverGroup.add(mast);
+
+      map3dRover = roverGroup;
+      map3dScene.add(roverGroup);
+
+      updateMap3DRover();
+      renderMap3DBeacons();
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const t = Date.now() * 0.003;
+        map3dBeacons.forEach(b => {
+          b.scale.set(1 + Math.sin(t) * 0.2, 1 + Math.sin(t) * 0.2, 1 + Math.sin(t) * 0.2);
+          b.rotation.y += 0.02;
+        });
+        if (map3dRenderer && map3dScene && map3dCamera) {
+          map3dRenderer.render(map3dScene, map3dCamera);
+        }
+      }
+      animate();
+    } catch (e) {
+      console.warn("[Map3D] Init error:", e);
     }
-    animate();
   }
 
   function updateMap3DRover() {
@@ -644,7 +649,7 @@
     if (countWo) countWo.innerText = appState.work_orders.length;
     if (woContainer) {
       if (appState.work_orders.length === 0) {
-        woContainer.innerHTML = `<div style="text-align:center; padding:40px 20px; color:var(--text-muted); font-size:12px;">No active work orders. Work orders will auto-draft upon defect detection.</div>`;
+        woContainer.innerHTML = `<div style="text-align:center; padding:40px 20px; color:var(--text-muted); font-size:12px;">No active work orders. Work orders auto-draft upon defect detection.</div>`;
       } else {
         woContainer.innerHTML = appState.work_orders.map(wo => `
           <div class="wo-card" onclick="window.openIssueModal('${wo.issue_id}')">
@@ -704,12 +709,17 @@
 
     if (sourceType === 'PHONE_STREAM') {
       if (webcamStream) { webcamStream.getTracks().forEach(t => t.stop()); webcamStream = null; }
-      if (video) video.style.display = 'none';
-      if (staticImg) {
-        staticImg.style.display = 'block';
-        if (latestPhoneFrame) staticImg.src = latestPhoneFrame;
+      if (latestPhoneFrame) {
+        if (video) video.style.display = 'none';
+        if (staticImg) {
+          staticImg.style.display = 'block';
+          staticImg.src = latestPhoneFrame;
+        }
+      } else {
+        // Fallback simulation until phone frame arrives
+        startSimulation();
       }
-      showToast("Live Phone Stream mode active. Open /camera.html on mobile.");
+      showToast("Phone stream active. Open /camera.html on mobile.");
     } else if (sourceType === 'WEBCAM') {
       if (staticImg) staticImg.style.display = 'none';
       if (video) video.style.display = 'block';
@@ -719,7 +729,7 @@
           if (video) { video.srcObject = stream; video.play(); }
         })
         .catch(err => {
-          showToast("Webcam unavailable, reverting to Simulation.", "alert");
+          showToast("Webcam inaccessible, running simulation.", "alert");
           window.setVideoSource('SIMULATION');
         });
     } else if (sourceType === 'UPLOAD') {
@@ -730,22 +740,22 @@
     } else {
       // SIMULATION
       if (webcamStream) { webcamStream.getTracks().forEach(t => t.stop()); webcamStream = null; }
-      if (staticImg) staticImg.style.display = 'none';
-      if (video) video.style.display = 'block';
       startSimulation();
     }
   };
 
   window.loadPresetSample = function(type) {
     const staticImg = document.getElementById('rover-static-view');
-    if (type === 'GARBAGE') {
-      currentPresetBase64 = getGarbageSvgDataUri();
-    } else if (type === 'CLEAN') {
-      currentPresetBase64 = getRepairedSvgDataUri();
-    } else {
-      currentPresetBase64 = getPotholeSvgDataUri();
-    }
-    if (staticImg) staticImg.src = currentPresetBase64;
+    const video = document.getElementById('rover-video');
+    if (video) video.style.display = 'none';
+    if (staticImg) staticImg.style.display = 'block';
+
+    const pSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480"><rect width="640" height="480" fill="#22252a"/><path d="M0,0 L640,0 L640,480 L0,480 Z" fill="#2d3138"/><line x1="320" y1="0" x2="320" y2="480" stroke="#f59e0b" stroke-dasharray="25,25" stroke-width="6"/><ellipse cx="360" cy="270" rx="140" ry="90" fill="#141517"/><text x="30" y="50" font-family="monospace" font-size="18" fill="#00d2b4">SAMPLE: Critical Pothole Defect [WP-04]</text></svg>`;
+    const gSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480"><rect width="640" height="480" fill="#2b2d30"/><rect x="0" y="240" width="640" height="240" fill="#3a3e45"/><ellipse cx="380" cy="310" rx="160" ry="80" fill="#3d372e"/><circle cx="340" cy="280" r="35" fill="#4a7c59"/><circle cx="410" cy="290" r="40" fill="#2d5d7b"/><text x="30" y="50" font-family="monospace" font-size="18" fill="#00d2b4">SAMPLE: Garbage Heap [WP-03]</text></svg>`;
+    const cSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480"><rect width="640" height="480" fill="#22252a"/><path d="M0,0 L640,0 L640,480 L0,480 Z" fill="#2d3138"/><line x1="320" y1="0" x2="320" y2="480" stroke="#f59e0b" stroke-dasharray="25,25" stroke-width="6"/><ellipse cx="360" cy="270" rx="150" ry="100" fill="#1f2022"/><text x="30" y="50" font-family="monospace" font-size="18" fill="#10b981">SAMPLE: Clean / Repaired Road [WP-01]</text></svg>`;
+
+    currentPresetBase64 = `data:image/svg+xml;base64,${btoa(type === 'GARBAGE' ? gSvg : (type === 'CLEAN' ? cSvg : pSvg))}`;
+    staticImg.src = currentPresetBase64;
     showToast(`Loaded ${type} sample frame. Click 'Inspect Current Frame' to scan.`);
   };
 
@@ -756,7 +766,12 @@
     reader.onload = (evt) => {
       currentPresetBase64 = evt.target.result;
       const staticImg = document.getElementById('rover-static-view');
-      if (staticImg) staticImg.src = evt.target.result;
+      const video = document.getElementById('rover-video');
+      if (video) video.style.display = 'none';
+      if (staticImg) {
+        staticImg.style.display = 'block';
+        staticImg.src = evt.target.result;
+      }
       showToast("Custom image frame loaded ready for inspection.");
     };
     reader.readAsDataURL(file);
@@ -910,8 +925,8 @@
     document.getElementById('modal-kicker').innerText = `ISSUE DOSSIER // ${issue.id} [${issue.waypoint_id}]`;
     document.getElementById('modal-title').innerText = `${issue.hazard_type}: ${issue.visual_description || ''}`;
 
-    document.getElementById('modal-img-before').src = issue.primary_evidence_image || getPotholeSvgDataUri();
-    document.getElementById('modal-img-after').src = issue.reinspection_evidence || issue.repair_claim_image || issue.primary_evidence_image || getRepairedSvgDataUri();
+    document.getElementById('modal-img-before').src = issue.primary_evidence_image || '';
+    document.getElementById('modal-img-after').src = issue.reinspection_evidence || issue.repair_claim_image || issue.primary_evidence_image || '';
 
     document.getElementById('modal-meta-model').innerText = `Model: ${issue.ai_model || 'Local Edge VLM'}`;
     document.getElementById('modal-meta-conf').innerText = `Confidence: ${(issue.confidence_score * 100).toFixed(0)}%`;
@@ -967,7 +982,7 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        repair_image_base64: getRepairedSvgDataUri(),
+        repair_image_base64: latestPhoneFrame || currentPresetBase64,
         claim_notes: "Polymer cold mix asphalt compacted with tack coat per IRC:SP:98. Ready for audit.",
         contractor_rep: "Shri Balaji Roadworks Ltd."
       })
@@ -985,7 +1000,7 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        reinspection_image_base64: getRepairedSvgDataUri(),
+        reinspection_image_base64: latestPhoneFrame || currentPresetBase64,
         notes: "Rover follow-up sweep frame captured. Pavement level confirmed."
       })
     });
@@ -1050,6 +1065,7 @@
     if (snap) appState = snap;
 
     initCameraWebSocket();
+    startSimulation();
     initMap2D();
     initMap3D();
     renderAll();
@@ -1071,7 +1087,7 @@
       };
     } catch (e) {}
 
-    console.log("[NAGAR-BOT] Live streaming engine active.");
+    console.log("[NAGAR-BOT] All command center subsystems active.");
   }
 
   if (document.readyState === 'loading') {
