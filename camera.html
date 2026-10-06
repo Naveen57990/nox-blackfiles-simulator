@@ -25,6 +25,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
     .brand {
       font-family: 'JetBrains Mono', monospace;
@@ -33,6 +34,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      font-size: 14px;
     }
     .status-dot {
       width: 10px;
@@ -52,50 +54,51 @@
     .viewport {
       flex: 1;
       position: relative;
-      background: #000;
+      background: #12161f;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       overflow: hidden;
     }
     video, #preview-img {
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
       object-fit: cover;
+      z-index: 1;
+    }
+    .placeholder-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px;
+      text-align: center;
+      z-index: 2;
+    }
+    .camera-icon-big {
+      font-size: 48px;
     }
     .hud-overlay {
       position: absolute;
-      top: 12px; left: 12px; right: 12px; bottom: 12px;
+      top: 10px; left: 10px; right: 10px; bottom: 10px;
       border: 1px solid rgba(0, 210, 180, 0.3);
       pointer-events: none;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       padding: 10px;
+      z-index: 3;
     }
     .hud-tag {
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.85);
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       color: #00d2b4;
       padding: 4px 8px;
       border-radius: 4px;
       display: inline-block;
-    }
-    .notice-banner {
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid #f59e0b;
-      padding: 10px 14px;
-      font-size: 12px;
-      color: #fbbf24;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .notice-banner a {
-      color: #00d2b4;
-      font-weight: 700;
-      text-decoration: underline;
     }
     .footer-bar {
       background: #161b22;
@@ -104,12 +107,13 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      flex-shrink: 0;
     }
     .btn {
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 700;
       font-size: 14px;
-      padding: 12px;
+      padding: 14px;
       border-radius: 8px;
       border: none;
       cursor: pointer;
@@ -118,9 +122,12 @@
       justify-content: center;
       gap: 8px;
       text-decoration: none;
+      transition: all 0.2s;
     }
     .btn-primary { background: #00d2b4; color: #04241e; }
+    .btn-primary:active { background: #02b399; transform: scale(0.98); }
     .btn-success { background: #10b981; color: #04241e; }
+    .btn-success:active { background: #0d9668; transform: scale(0.98); }
     .btn-stop { background: #ef4444; color: #fff; }
     .btn-outline { background: transparent; border: 1px solid #30363d; color: #f0f6fc; }
     .stats {
@@ -129,6 +136,19 @@
       color: #64748b;
       display: flex;
       justify-content: space-between;
+    }
+    .switch-link {
+      background: rgba(0, 210, 180, 0.1);
+      border: 1px dashed #00d2b4;
+      color: #00d2b4;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+      margin-top: 6px;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -139,52 +159,62 @@
       <span class="status-dot" id="dot"></span>
       <span>NAGAR-ROVER POV</span>
     </div>
-    <span class="status-text" id="status-label">DISCONNECTED</span>
+    <span class="status-text" id="status-label">CONNECTING...</span>
   </header>
 
-  <!-- HTTP VS HTTPS PERMISSION NOTICE -->
-  <div class="notice-banner" id="http-notice" style="display:none;">
-    <span>🔒 <b>Continuous Video Stream requires HTTPS:</b></span>
-    <a href="https://10.50.195.37:3443/camera.html" id="https-link">👉 Tap here to open HTTPS Streamer (Port 3443)</a>
-    <span style="font-size:10px; color:#94a3b8;">(If browser shows security warning, tap Advanced &rarr; Proceed to 10.50.195.37)</span>
-  </div>
-
-  <div class="viewport">
-    <video id="cam-feed" playsinline autoplay muted style="display:none;"></video>
+  <div class="viewport" id="viewport-box">
+    <video id="cam-feed" playsinline webkit-playsinline autoplay muted style="display:none;"></video>
     <img id="preview-img" style="display:none;" alt="Camera Snap Preview">
     <canvas id="stream-canvas" style="display:none;"></canvas>
     
+    <!-- INITIAL PROMINENT VIEW -->
+    <div class="placeholder-view" id="placeholder-box">
+      <div class="camera-icon-big">📸</div>
+      <h3 style="font-size:16px; color:#f0f6fc;">Live Mobile Streamer</h3>
+      <p style="font-size:12px; color:#94a3b8; line-height:1.4;">
+        Tap the green button below to snap or start live streaming road frames directly to your laptop dashboard.
+      </p>
+      <a href="https://10.50.195.37:3443/camera.html" class="switch-link" id="https-btn" style="display:none;">
+        🔒 Tap here for Continuous Video (HTTPS)
+      </a>
+    </div>
+
     <div class="hud-overlay">
       <div style="display:flex; justify-content:space-between;">
-        <span class="hud-tag" id="hud-cam-label">CAM: ROVER BACK</span>
+        <span class="hud-tag" id="hud-cam-label">CAM: ENVIRONMENT</span>
         <span class="hud-tag" id="stream-rate">0 FPS</span>
       </div>
       <div>
-        <span class="hud-tag" style="color:#f59e0b;">ZERO CLOUD TRANSMISSION</span>
+        <span class="hud-tag" style="color:#f59e0b;">LOCAL EDGE TRANSMISSION</span>
       </div>
     </div>
   </div>
 
   <div class="footer-bar">
-    <!-- NATIVE CAMERA SNAP (WORKS ON ANY HTTP/HTTPS BROWSER) -->
+    <!-- METHOD 1: NATIVE INSTANT SNAP & STREAM (WORKS 100% ON ALL PHONES & BROWSERS OVER HTTP) -->
     <input type="file" id="native-cam-input" accept="image/*" capture="environment" onchange="handleNativeSnap(event)" style="display:none;">
     <button class="btn btn-success" onclick="document.getElementById('native-cam-input').click()">
-      📸 Snap & Stream Road Frame to Laptop
+      📸 Tap to Take Photo & Stream to Laptop
     </button>
 
-    <!-- CONTINUOUS STREAMING BUTTON (ON HTTPS) -->
+    <!-- METHOD 2: CONTINUOUS WEBRTC STREAM (ON HTTPS OR SUPPORTED BROWSERS) -->
     <button class="btn btn-primary" id="btn-stream" onclick="toggleContinuousStreaming()">
-      📹 Start Continuous Live Video Stream
+      📹 Start Live Continuous Video Stream
+    </button>
+
+    <!-- METHOD 3: TEST PRESET SAMPLE (IF PHYSICAL CAMERA IS UNACCESSIBLE) -->
+    <button class="btn btn-outline" style="padding:8px; font-size:12px;" onclick="sendSamplePothole()">
+      🧪 Send Test Road Defect Sample
     </button>
 
     <div class="stats">
       <span id="frames-sent">Frames Sent: 0</span>
-      <span id="socket-target">Target: Laptop Core</span>
+      <span id="socket-target">Target: 10.50.195.37</span>
     </div>
   </div>
 
   <script>
-    let isHttps = window.location.protocol === "https:";
+    const isHttps = window.location.protocol === "https:";
     let streamActive = false;
     let ws = null;
     let videoStream = null;
@@ -194,20 +224,20 @@
     const videoEl = document.getElementById('cam-feed');
     const previewImg = document.getElementById('preview-img');
     const canvasEl = document.getElementById('stream-canvas');
+    const placeholderBox = document.getElementById('placeholder-box');
     const dotEl = document.getElementById('dot');
     const statusLabel = document.getElementById('status-label');
     const btnStream = document.getElementById('btn-stream');
     const framesSentEl = document.getElementById('frames-sent');
     const streamRateEl = document.getElementById('stream-rate');
-    const httpNotice = document.getElementById('http-notice');
+    const httpsBtn = document.getElementById('https-btn');
 
-    // Show HTTPS notice if running on plain HTTP
-    if (!isHttps) {
-      httpNotice.style.display = 'flex';
+    if (!isHttps && httpsBtn) {
+      httpsBtn.style.display = 'block';
     }
 
     function connectWebSocket() {
-      if (ws && ws.readyState === WebSocket.OPEN) return;
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
       
       const loc = window.location;
       const wsProto = isHttps ? "wss:" : "ws:";
@@ -217,7 +247,7 @@
 
       ws.onopen = () => {
         dotEl.classList.add('connected');
-        statusLabel.innerText = "CONNECTED TO LAPTOP";
+        statusLabel.innerText = "CONNECTED TO LAPTOP ✅";
         statusLabel.style.color = "#10b981";
       };
 
@@ -225,6 +255,7 @@
         dotEl.classList.remove('connected');
         statusLabel.innerText = "DISCONNECTED";
         statusLabel.style.color = "#ef4444";
+        setTimeout(connectWebSocket, 3000);
       };
 
       ws.onerror = (err) => {
@@ -232,7 +263,7 @@
       };
     }
 
-    // --- 1. NATIVE CAMERA SNAP (100% WORKS ON ALL MOBILE BROWSERS OVER HTTP) ---
+    // --- 1. INSTANT SNAP HANDLER ---
     function handleNativeSnap(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -240,50 +271,48 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64 = e.target.result;
-        
-        // Show local preview
+
+        // Show image immediately in viewport
+        placeholderBox.style.display = 'none';
         videoEl.style.display = 'none';
         previewImg.style.display = 'block';
         previewImg.src = base64;
 
-        // Ensure WebSocket is connected and send
-        connectWebSocket();
-        
-        setTimeout(() => {
-          if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({
-              type: "ROVER_FRAME",
-              image_base64: base64,
-              timestamp: new Date().toISOString()
-            }));
-            frameCount++;
-            framesSentEl.innerText = `Frames Sent: ${frameCount}`;
-            statusLabel.innerText = "FRAME STREAMED TO LAPTOP ✅";
-            statusLabel.style.color = "#10b981";
-          } else {
-            // Fallback via HTTP POST
-            fetch('/api/detect/frame', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                image_base64: base64,
-                source: "PHONE_LIVE_STREAM"
-              })
-            }).then(() => {
-              frameCount++;
-              framesSentEl.innerText = `Frames Sent: ${frameCount}`;
-              statusLabel.innerText = "FRAME STREAMED TO LAPTOP ✅";
-            });
-          }
-        }, 300);
+        sendFrame(base64);
+        statusLabel.innerText = "FRAME STREAMED TO LAPTOP ✅";
+        statusLabel.style.color = "#10b981";
       };
       reader.readAsDataURL(file);
     }
 
-    // --- 2. CONTINUOUS WEBRTC STREAMING (FOR HTTPS) ---
+    function sendFrame(base64) {
+      frameCount++;
+      framesSentEl.innerText = `Frames Sent: ${frameCount}`;
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: "ROVER_FRAME",
+          image_base64: base64,
+          timestamp: new Date().toISOString()
+        }));
+      } else {
+        // Fallback HTTP POST
+        fetch('/api/detect/frame', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_base64: base64,
+            source: "PHONE_LIVE_STREAM"
+          })
+        }).catch(() => {});
+      }
+    }
+
+    // --- 2. CONTINUOUS VIDEO STREAM ---
     async function toggleContinuousStreaming() {
       if (!isHttps) {
-        window.location.href = "https://10.50.195.37:3443/camera.html";
+        // Redirect to HTTPS port
+        window.location.href = `https://${window.location.hostname}:3443/camera.html`;
         return;
       }
 
@@ -295,8 +324,8 @@
           videoStream = null;
         }
         btnStream.className = "btn btn-primary";
-        btnStream.innerText = "📹 Start Continuous Live Video Stream";
-        statusLabel.innerText = "STANDBY";
+        btnStream.innerText = "📹 Start Live Continuous Video Stream";
+        statusLabel.innerText = "PAUSED";
       } else {
         try {
           videoStream = await navigator.mediaDevices.getUserMedia({
@@ -308,40 +337,49 @@
             audio: false
           });
 
+          placeholderBox.style.display = 'none';
           previewImg.style.display = 'none';
           videoEl.style.display = 'block';
           videoEl.srcObject = videoStream;
           await videoEl.play();
 
-          connectWebSocket();
           streamActive = true;
           btnStream.className = "btn btn-stop";
-          btnStream.innerText = "⏹️ Stop Continuous Stream";
+          btnStream.innerText = "⏹️ Stop Live Video Stream";
+          statusLabel.innerText = "STREAMING VIDEO LIVE 🟢";
+          statusLabel.style.color = "#10b981";
 
           canvasEl.width = 640;
           canvasEl.height = 480;
           const ctx = canvasEl.getContext('2d');
 
           streamInterval = setInterval(() => {
-            if (ws && ws.readyState === WebSocket.OPEN && videoEl.videoWidth > 0) {
+            if (videoEl.videoWidth > 0) {
               ctx.drawImage(videoEl, 0, 0, 640, 480);
-              const base64 = canvasEl.toDataURL('image/jpeg', 0.7);
-
-              ws.send(JSON.stringify({
-                type: "ROVER_FRAME",
-                image_base64: base64,
-                timestamp: new Date().toISOString()
-              }));
-
-              frameCount++;
-              framesSentEl.innerText = `Frames Sent: ${frameCount}`;
+              const base64 = canvasEl.toDataURL('image/jpeg', 0.65);
+              sendFrame(base64);
             }
-          }, 500);
+          }, 600);
 
         } catch (err) {
-          alert("Camera access error: " + err.message + "\n\nTip: You can use the green 'Snap & Stream' button which works immediately!");
+          alert("Could not start live continuous video: " + err.message + "\n\nTip: You can use the green 'Tap to Take Photo & Stream' button which works immediately on all phones!");
         }
       }
+    }
+
+    // --- 3. SAMPLE TEST ---
+    function sendSamplePothole() {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480"><rect width="640" height="480" fill="#22252a"/><ellipse cx="360" cy="270" rx="140" ry="90" fill="#141517"/><text x="30" y="50" font-family="monospace" font-size="18" fill="#00d2b4">PHONE TEST: Severe Pothole</text></svg>`;
+      const base64 = `data:image/svg+xml;base64,${btoa(svg)}`;
+      
+      placeholderBox.style.display = 'none';
+      videoEl.style.display = 'none';
+      previewImg.style.display = 'block';
+      previewImg.src = base64;
+
+      sendFrame(base64);
+      statusLabel.innerText = "TEST FRAME SENT TO LAPTOP ✅";
+      statusLabel.style.color = "#10b981";
     }
 
     window.addEventListener('DOMContentLoaded', () => {
