@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NAGAR-BOT // Mobile Rover Camera Streamer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090c10;
+      color: #f0f6fc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      color: #00d2b4;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+    .status-dot.connected {
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+    }
+    .status-text {
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+    }
+    .viewport {
+      flex: 1;
+      position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .hud-overlay {
+      position: absolute;
+      top: 12px; left: 12px; right: 12px; bottom: 12px;
+      border: 1px solid rgba(0, 210, 180, 0.3);
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px;
+    }
+    .hud-tag {
+      background: rgba(0,0,0,0.8);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #00d2b4;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .footer-bar {
+      background: #161b22;
+      border-top: 1px solid #30363d;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-start { background: #00d2b4; color: #04241e; }
+    .btn-stop { background: #ef4444; color: #fff; }
+    .stats {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span class="status-dot" id="dot"></span>
+      <span>NAGAR-ROVER POV</span>
+    </div>
+    <span class="status-text" id="status-label">DISCONNECTED</span>
+  </header>
+
+  <div class="viewport">
+    <video id="cam-feed" playsinline autoplay muted></video>
+    <canvas id="stream-canvas" style="display:none;"></canvas>
+    
+    <div class="hud-overlay">
+      <div style="display:flex; justify-content:space-between;">
+        <span class="hud-tag">CAM: REAR WIDE</span>
+        <span class="hud-tag" id="stream-rate">0 FPS</span>
+      </div>
+      <div>
+        <span class="hud-tag" style="color:#f59e0b;">ZERO CLOUD TRANSMISSION</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <button class="btn btn-start" id="btn-stream" onclick="toggleStreaming()">📹 Start Live Rover Stream to Laptop</button>
+    <div class="stats">
+      <span id="frames-sent">Frames Sent: 0</span>
+      <span id="socket-target">Target: Local Core</span>
+    </div>
+  </div>
+
+  <script>
+    let streamActive = false;
+    let ws = null;
+    let videoStream = null;
+    let streamInterval = null;
+    let frameCount = 0;
+
+    const videoEl = document.getElementById('cam-feed');
+    const canvasEl = document.getElementById('stream-canvas');
+    const dotEl = document.getElementById('dot');
+    const statusLabel = document.getElementById('status-label');
+    const btnStream = document.getElementById('btn-stream');
+    const framesSentEl = document.getElementById('frames-sent');
+    const streamRateEl = document.getElementById('stream-rate');
+
+    async function startCamera() {
+      try {
+        videoStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          },
+          audio: false
+        });
+        videoEl.srcObject = videoStream;
+        await videoEl.play();
+      } catch (e) {
+        alert("Camera permission required: " + e.message);
+      }
+    }
+
+    function connectWebSocket() {
+      const loc = window.location;
+      const wsProto = loc.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${wsProto}//${loc.host}/ws/camera`;
+
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        dotEl.classList.add('connected');
+        statusLabel.innerText = "STREAMING LIVE TO LAPTOP";
+        statusLabel.style.color = "#10b981";
+      };
+
+      ws.onclose = () => {
+        dotEl.classList.remove('connected');
+        statusLabel.innerText = "DISCONNECTED";
+        statusLabel.style.color = "#ef4444";
+      };
+
+      ws.onerror = (err) => {
+        console.warn("WebSocket error:", err);
+      };
+    }
+
+    async function toggleStreaming() {
+      if (streamActive) {
+        // Stop
+        streamActive = false;
+        clearInterval(streamInterval);
+        if (ws) ws.close();
+        btnStream.className = "btn btn-start";
+        btnStream.innerText = "📹 Start Live Rover Stream to Laptop";
+        statusLabel.innerText = "STANDBY";
+        dotEl.classList.remove('connected');
+      } else {
+        // Start
+        if (!videoStream) await startCamera();
+        connectWebSocket();
+        streamActive = true;
+        btnStream.className = "btn btn-stop";
+        btnStream.innerText = "⏹️ Stop Live Stream";
+
+        canvasEl.width = 640;
+        canvasEl.height = 480;
+        const ctx = canvasEl.getContext('2d');
+
+        let lastCount = 0;
+        setInterval(() => {
+          if (streamActive) {
+            const fps = frameCount - lastCount;
+            lastCount = frameCount;
+            streamRateEl.innerText = `${fps} FPS`;
+          }
+        }, 1000);
+
+        // Send frames at ~2 FPS (optimal for real-time edge VLM inference)
+        streamInterval = setInterval(() => {
+          if (ws && ws.readyState === WebSocket.OPEN && videoEl.videoWidth > 0) {
+            ctx.drawImage(videoEl, 0, 0, 640, 480);
+            const base64 = canvasEl.toDataURL('image/jpeg', 0.7);
+            
+            ws.send(JSON.stringify({
+              type: "ROVER_FRAME",
+              image_base64: base64,
+              timestamp: new Date().toISOString()
+            }));
+
+            frameCount++;
+            framesSentEl.innerText = `Frames Sent: ${frameCount}`;
+          }
+        }, 500);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      startCamera();
+    });
+  </script>
+
+</body>
+</html>

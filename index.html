@@ -62,14 +62,21 @@
     <section class="panel panel-rover">
       <div class="panel-header">
         <div class="title-with-badge">
-          <h2>📷 Rover Camera Ingestion (POV)</h2>
-          <span class="status-pill status-live" id="cam-status-pill">LIVE FEED</span>
+          <h2>📷 Rover Camera Feed (POV)</h2>
+          <span class="status-pill status-live" id="cam-status-pill">LIVE SCAN</span>
         </div>
         <div class="cam-source-tabs">
-          <button class="source-tab active" data-source="SIMULATION" onclick="window.setVideoSource('SIMULATION')">Route Sim</button>
-          <button class="source-tab" data-source="WEBCAM" onclick="window.setVideoSource('WEBCAM')">Phone / WebCam</button>
-          <button class="source-tab" data-source="UPLOAD" onclick="window.setVideoSource('UPLOAD')">Upload Frame</button>
+          <button class="source-tab active" data-source="PHONE_STREAM" onclick="window.setVideoSource('PHONE_STREAM')">📱 Phone Stream</button>
+          <button class="source-tab" data-source="SIMULATION" onclick="window.setVideoSource('SIMULATION')">Route Sim</button>
+          <button class="source-tab" data-source="WEBCAM" onclick="window.setVideoSource('WEBCAM')">Laptop WebCam</button>
+          <button class="source-tab" data-source="UPLOAD" onclick="window.setVideoSource('UPLOAD')">Upload</button>
         </div>
+      </div>
+
+      <!-- STREAM INSTRUCTION CALLOUT -->
+      <div id="phone-stream-callout" style="background: rgba(0,210,180,0.08); border-bottom:1px solid var(--border-subtle); padding:6px 12px; font-size:11px; display:flex; justify-content:space-between; align-items:center;">
+        <span>📱 Open on phone: <b style="color:var(--accent-cyan); font-family:var(--font-mono);">http://10.50.195.37:3000/camera.html</b></span>
+        <span id="phone-conn-indicator" style="color:var(--accent-amber); font-weight:700; font-family:var(--font-mono);">Awaiting Phone...</span>
       </div>
 
       <div class="video-container">
